@@ -2,12 +2,25 @@ import { useEffect, useState } from 'react';
 import GameScreen from './components/GameScreen.jsx';
 import LevelMap from './components/LevelMap.jsx';
 import SeedMenu from './components/SeedMenu.jsx';
-import { loadLastSeed, loadProgress, saveLastSeed, saveLevelResult } from './game/progress.js';
+import {
+  decodeProgress,
+  encodeProgress,
+  importProgress,
+  loadLastSeed,
+  loadProgress,
+  saveLastSeed,
+  saveLevelResult,
+} from './game/progress.js';
 import { randomSeed } from './game/seed.js';
 
 const readUrlParams = () => {
   const params = new URLSearchParams(window.location.search);
-  return { seed: params.get('seed'), level: Number(params.get('level')) || null };
+  const shared = params.get('p');
+  return {
+    seed: params.get('seed'),
+    level: Number(params.get('level')) || null,
+    shared: shared ? decodeProgress(shared) : null,
+  };
 };
 
 const initialScreen = ({ seed, level }) => {
@@ -21,17 +34,17 @@ const App = () => {
   const [screen, setScreen] = useState(() => initialScreen(initial));
   const [levelNumber, setLevelNumber] = useState(initial.level ?? 1);
   const [attempt, setAttempt] = useState(0);
-  const [progress, setProgress] = useState(() => loadProgress(seed));
+  const [progress, setProgress] = useState(() => (initial.shared ? importProgress(seed, initial.shared) : loadProgress(seed)));
 
   useEffect(() => {
     if (screen === 'menu') {
       window.history.replaceState(null, '', window.location.pathname);
       return;
     }
-    const params = new URLSearchParams({ seed });
+    const params = new URLSearchParams({ seed, p: encodeProgress(progress) });
     if (screen === 'game') params.set('level', levelNumber);
     window.history.replaceState(null, '', `?${params}`);
-  }, [seed, screen, levelNumber]);
+  }, [seed, screen, levelNumber, progress]);
 
   const chooseSeed = (nextSeed) => {
     setSeed(nextSeed);

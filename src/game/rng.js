@@ -33,5 +33,10 @@ export const createRng = (seed) => {
     return items;
   };
 
-  return { next, int, pick, chance, shuffle };
+  const getState = () => state;
+  const setState = (value) => {
+    state = value;
+  };
+
+  return { next, int, pick, chance, shuffle, getState, setState };
 };

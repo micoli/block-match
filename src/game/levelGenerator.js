@@ -1,8 +1,15 @@
 import { createGrid, setMirrored } from './grid.js';
 import { createRng, hashSeed } from './rng.js';
+import { solve } from './solver.js';
 
 const DIFFICULTY_RAMP = 60;
 const MAX_GOALS = 3;
+const MAX_SOLVER_MOVES = 28;
+const MAX_MOVES = 45;
+const MIN_COLOR_TARGET = 5;
+const COLOR_TARGET_STEP = 5;
+const HUMAN_MARGIN = 1.5;
+const HUMAN_EXTRA_MOVES = 2;
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const roundTo5 = (value) => Math.max(5, Math.round(value / 5) * 5);
@@ -114,6 +121,61 @@ const computeMoves = (goals, boxes, ice, colors, difficulty) => {
   return clamp(Math.round(effort * slack + 3), 10, 40);
 };
 
+const mapGrid = (grid, fn) => grid.map((row) => row.map(fn));
+
+const syncGoalTargets = (goals, boxes, ice) =>
+  goals
+    .map((goal) => {
+      if (goal.type === 'box') return { ...goal, target: countCells(boxes) };
+      if (goal.type === 'ice') return { ...goal, target: countCells(ice) };
+      return goal;
+    })
+    .filter((goal) => goal.type === 'color' || goal.target > 0);
+
+const lowerColorTargets = (goals) => {
+  const colorGoals = goals.filter((goal) => goal.type === 'color');
+  if (!colorGoals.some((goal) => goal.target > MIN_COLOR_TARGET)) return null;
+  return goals.map((goal) =>
+    goal.type === 'color' ? { ...goal, target: Math.max(MIN_COLOR_TARGET, goal.target - COLOR_TARGET_STEP) } : goal,
+  );
+};
+
+const halve = (grid) => {
+  let kept = 0;
+  return mapGrid(grid, (value) => {
+    if (value === 0) return 0;
+    return kept++ % 2 === 0 ? value : 0;
+  });
+};
+
+const easeLevel = (level) => {
+  const lowered = lowerColorTargets(level.goals);
+  if (lowered) return { ...level, goals: lowered };
+
+  const hasStrong = level.boxes.flat().some((v) => v > 1) || level.ice.flat().some((v) => v > 1);
+  const boxes = hasStrong ? mapGrid(level.boxes, (v) => Math.min(1, v)) : halve(level.boxes);
+  const ice = hasStrong ? mapGrid(level.ice, (v) => Math.min(1, v)) : halve(level.ice);
+  const goals = syncGoalTargets(level.goals, boxes, ice);
+  if (goals.length) return { ...level, boxes, ice, goals };
+  return { ...level, boxes, ice, goals: [{ type: 'color', color: 0, target: MIN_COLOR_TARGET * 2 }] };
+};
+
+const humanBudget = (solverMoves) => Math.ceil(solverMoves * HUMAN_MARGIN) + HUMAN_EXTRA_MOVES;
+
+// Guarantees winnability: a bot plays the real engine with the level's seeded rng, so a
+// winning sequence within the returned budget is known to exist.
+const withWinnableBudget = (level) => {
+  let current = level;
+  for (;;) {
+    const solverMoves = solve(current, MAX_SOLVER_MOVES);
+    if (solverMoves !== null) {
+      const moves = Math.min(MAX_MOVES, Math.max(current.moves, humanBudget(solverMoves)));
+      return { ...current, moves };
+    }
+    current = easeLevel(current);
+  }
+};
+
 export const generateLevel = (seed, number) => {
   const rng = createRng(hashSeed(`${seed}:level:${number}`));
   const difficulty = Math.min(1, (number - 1) / DIFFICULTY_RAMP);
@@ -126,7 +188,7 @@ export const generateLevel = (seed, number) => {
   const ice = placeIce(rng, holes, boxes, rows, cols, number, difficulty);
   const goals = buildGoals(rng, colors, boxes, ice, difficulty);
 
-  return {
+  const level = {
     seed,
     number,
     difficulty,
@@ -140,4 +202,5 @@ export const generateLevel = (seed, number) => {
     moves: computeMoves(goals, boxes, ice, colors, difficulty),
     tileSeed: hashSeed(`${seed}:tiles:${number}`),
   };
+  return withWinnableBudget(level);
 };
