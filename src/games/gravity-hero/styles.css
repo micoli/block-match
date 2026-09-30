@@ -1,5 +1,5 @@
 .gh-game {
-  --gh-lane: min(76px, calc((100vw - 24px) / 4), calc((100dvh - 250px) / 9));
+  --gh-lane: min(76px, calc((100vw - 24px) / var(--gh-lanes)), calc((100dvh - 250px) / 9));
   --gh-head: calc(var(--gh-lane) * 0.8);
   display: flex;
   flex-direction: column;
@@ -15,7 +15,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: calc(var(--gh-lane) * 4);
+  width: calc(var(--gh-lane) * var(--gh-lanes));
   min-width: 280px;
 }
 
@@ -51,7 +51,7 @@
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  width: calc(var(--gh-lane) * 4);
+  width: calc(var(--gh-lane) * var(--gh-lanes));
   min-width: 280px;
   padding: 8px 12px;
   border-radius: 14px;
@@ -106,7 +106,7 @@
 
 .gh-board {
   perspective: 900px;
-  width: calc(var(--gh-lane) * 4);
+  width: calc(var(--gh-lane) * var(--gh-lanes));
   min-width: 280px;
   height: calc(var(--gh-lane) * 9);
   margin-top: 14px;
@@ -118,7 +118,7 @@
 
 .gh-lanes {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(var(--gh-lanes), 1fr);
   width: 100%;
   height: 100%;
 }
@@ -244,7 +244,7 @@
 
 .gh-help {
   margin: 0;
-  max-width: calc(var(--gh-lane) * 4);
+  max-width: calc(var(--gh-lane) * var(--gh-lanes));
   min-width: 280px;
   text-align: center;
   font-size: 0.75rem;

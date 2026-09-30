@@ -1,12 +1,14 @@
 import { LEAD_IN_SECONDS, createChart, extendChart } from './chart';
 import { withAntigravBonus } from '../../../shared/gravity';
 import { nextRandom } from './random';
+import { SUPER_HERO } from './variants';
+import type { Variant } from './variants';
 import type { Action, GameState, JudgmentType, Note, NoteKind } from './types';
 
 export const TRAVEL_SECONDS = 2.2;
-export const PERFECT_WINDOW = 0.07;
-export const GOOD_WINDOW = 0.14;
-export const MAX_MISSES = 10;
+export const PERFECT_WINDOW = 0.2;
+export const GOOD_WINDOW = 0.5;
+export const MAX_MISSES = 20;
 export const FLIP_MIN_SECONDS = 10;
 export const FLIP_MAX_SECONDS = 15;
 
@@ -26,10 +28,11 @@ const drawFlipTime = (from: number, seed: number): [number, number] => {
   return [from + FLIP_MIN_SECONDS + value * (FLIP_MAX_SECONDS - FLIP_MIN_SECONDS), nextSeed];
 };
 
-export const createGame = (seed: number, gravityEnabled = true): GameState => {
-  const { chart, notes } = extendChart(createChart(seed), LEAD_IN_SECONDS + TRAVEL_SECONDS);
+export const createGame = (seed: number, gravityEnabled = true, variant: Variant = SUPER_HERO): GameState => {
+  const { chart, notes } = extendChart(createChart(seed, variant), LEAD_IN_SECONDS + TRAVEL_SECONDS, variant);
   const [nextFlipAt, flipSeed] = drawFlipTime(0, seed ^ 0x9e3779b9);
   return {
+    variant,
     status: 'playing',
     time: 0,
     notes,
@@ -132,7 +135,7 @@ const maybeFlip = (state: GameState): GameState => {
 const tick = (state: GameState, dt: number): GameState => {
   if (state.status === 'over') return state;
   const time = state.time + dt;
-  const { chart, notes: spawned } = extendChart(state.chart, time + TRAVEL_SECONDS);
+  const { chart, notes: spawned } = extendChart(state.chart, time + TRAVEL_SECONDS, state.variant);
   let next: GameState = { ...state, time, chart, notes: [...state.notes, ...spawned] };
 
   for (const note of state.notes) {
@@ -152,6 +155,6 @@ export const reduce = (state: GameState, action: Action): GameState => {
     case 'release':
       return release(state, action.lane);
     case 'restart':
-      return createGame(action.seed, state.gravityEnabled);
+      return createGame(action.seed, state.gravityEnabled, state.variant);
   }
 };

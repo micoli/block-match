@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useReducer, useState } from 'react';
 import { hashSeed } from '../../../shared/seed';
 import { createGame, reduce } from '../game/engine';
-import { LANES } from '../game/types';
+import type { Variant } from '../game/variants';
 
 export const FLIP_ANIMATION_MS = 700;
 export const LANE_KEYS = ['c', 'v', 'b', 'n'];
 
 const MAX_FRAME_SECONDS = 0.1;
 
-export const useGravityHero = (seed: string, gravityEnabled: boolean) => {
-  const [state, dispatch] = useReducer(reduce, undefined, () => createGame(hashSeed(seed), gravityEnabled));
+export const useGravityHero = (seed: string, gravityEnabled: boolean, variant: Variant) => {
+  const [state, dispatch] = useReducer(reduce, undefined, () => createGame(hashSeed(seed), gravityEnabled, variant));
   const [flipping, setFlipping] = useState(false);
-  const [pressed, setPressed] = useState<boolean[]>(() => Array(LANES).fill(false));
+  const [pressed, setPressed] = useState<boolean[]>(() => Array(variant.laneCount).fill(false));
   const playing = state.status === 'playing';
   const active = playing && !flipping;
 
@@ -59,7 +59,7 @@ export const useGravityHero = (seed: string, gravityEnabled: boolean) => {
     const laneOf = (event: KeyboardEvent) => LANE_KEYS.indexOf(event.key.toLowerCase());
     const onKeyDown = (event: KeyboardEvent) => {
       const lane = laneOf(event);
-      if (lane < 0 || event.ctrlKey || event.metaKey || event.altKey) return;
+      if (lane < 0 || lane >= variant.laneCount || event.ctrlKey || event.metaKey || event.altKey) return;
       event.preventDefault();
       if (!event.repeat) press(lane);
     };
@@ -73,7 +73,7 @@ export const useGravityHero = (seed: string, gravityEnabled: boolean) => {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
     };
-  }, [press, release]);
+  }, [press, release, variant.laneCount]);
 
   return { state, pressed, press, release, restart };
 };

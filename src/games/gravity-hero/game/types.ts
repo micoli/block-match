@@ -1,4 +1,4 @@
-export const LANES = 4;
+import type { Variant } from './variants';
 
 export type Gravity = 'down' | 'up';
 export type NoteKind = 'eighth' | 'quarter' | 'half';
@@ -24,6 +24,7 @@ export type Chart = {
 };
 
 export type GameState = {
+  variant: Variant;
   status: 'playing' | 'over';
   time: number;
   notes: Note[];

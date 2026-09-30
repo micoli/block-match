@@ -9,8 +9,8 @@ import {
   multiplierFor,
   reduce,
 } from './engine';
-import { createChart, extendChart } from './chart';
-import { LANES } from './types';
+import { LONG_NOTES_FROM_SECONDS, createChart, extendChart } from './chart';
+import { HERO, SUPER_HERO } from './variants';
 import type { GameState } from './types';
 
 const advance = (state: GameState, seconds: number, step = 0.05) => {
@@ -26,7 +26,7 @@ describe('chart', () => {
   it('is deterministic for a seed and uses the 4 lanes and 3 note kinds', () => {
     const { notes } = extendChart(createChart(5), 120);
     expect(extendChart(createChart(5), 120).notes).toEqual(notes);
-    expect(notes.every((note) => note.lane >= 0 && note.lane < LANES)).toBe(true);
+    expect(notes.every((note) => note.lane >= 0 && note.lane < SUPER_HERO.laneCount)).toBe(true);
     expect(new Set(notes.map((note) => note.kind))).toEqual(new Set(['eighth', 'quarter', 'half']));
   });
 
@@ -55,6 +55,30 @@ describe('lane progression', () => {
     expect(lanesBetween(0, 10).size).toBe(2);
     expect(lanesBetween(10, 40).size).toBe(3);
     expect(lanesBetween(40, 200).size).toBe(4);
+  });
+});
+
+describe('note progression', () => {
+  it('only plays eighth notes during the first minute', () => {
+    const { notes } = extendChart(createChart(6), 200);
+    const early = notes.filter((note) => note.time < LONG_NOTES_FROM_SECONDS);
+    const late = notes.filter((note) => note.time >= LONG_NOTES_FROM_SECONDS);
+    expect(early.every((note) => note.kind === 'eighth')).toBe(true);
+    expect(new Set(late.map((note) => note.kind))).toEqual(new Set(['eighth', 'quarter', 'half']));
+  });
+});
+
+describe('variants', () => {
+  it('limits Gravity Hero to 3 lanes', () => {
+    const { notes } = extendChart(createChart(2, HERO), 200, HERO);
+    expect(new Set(notes.map((note) => note.lane))).toEqual(new Set([0, 1, 2]));
+    expect(notes.filter((note) => note.time < 10).every((note) => note.lane < 2)).toBe(true);
+    expect(createGame(2, true, HERO).chart.busyUntil).toHaveLength(3);
+  });
+
+  it('uses all 4 lanes in Gravity Super-Hero', () => {
+    const { notes } = extendChart(createChart(2), 200);
+    expect(new Set(notes.map((note) => note.lane))).toEqual(new Set([0, 1, 2, 3]));
   });
 });
 
@@ -125,7 +149,9 @@ describe('recovery', () => {
 describe('hold notes', () => {
   const holdState = () => {
     let state = createGame(2);
-    while (!state.notes.some((note) => note.kind === 'half')) state = reduce(state, { type: 'tick', dt: 0.5 });
+    while (!state.notes.some((note) => note.kind === 'half')) {
+      state = { ...reduce(state, { type: 'tick', dt: 0.5 }), misses: 0, status: 'playing' };
+    }
     const hold = firstNote(state, 'half');
     return { state: { ...state, misses: 0, combo: 0, notes: [hold], chart: { ...state.chart, cursor: 1e9 } }, hold };
   };

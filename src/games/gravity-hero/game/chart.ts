@@ -1,5 +1,6 @@
 import { nextRandom } from './random';
-import { LANES } from './types';
+import { SUPER_HERO, activeLanes } from './variants';
+import type { Variant } from './variants';
 import type { Chart, Note, NoteKind } from './types';
 
 const BASE_BPM = 70;
@@ -14,20 +15,13 @@ const KIND_WEIGHTS: [NoteKind, number][] = [
 ];
 
 export const LEAD_IN_SECONDS = 2;
-
-const LANE_STAGES = [
-  { from: 0, lanes: [1, 2] },
-  { from: 10, lanes: [0, 1, 2] },
-  { from: 40, lanes: [0, 1, 2, 3] },
-];
-
-export const activeLanes = (time: number) =>
-  LANE_STAGES.filter((stage) => time >= stage.from).at(-1)?.lanes ?? LANE_STAGES[0].lanes;
+export const LONG_NOTES_FROM_SECONDS = 60;
 
 export const beatSeconds = (time: number) =>
   60 / Math.min(MAX_BPM, BASE_BPM + Math.floor(time / BPM_STEP_SECONDS) * BPM_STEP);
 
-const pickKind = (value: number): NoteKind => {
+const pickKind = (value: number, time: number): NoteKind => {
+  if (time < LONG_NOTES_FROM_SECONDS) return 'eighth';
   let total = 0;
   for (const [kind, weight] of KIND_WEIGHTS) {
     total += weight;
@@ -36,14 +30,14 @@ const pickKind = (value: number): NoteKind => {
   return 'half';
 };
 
-export const createChart = (seed: number): Chart => ({
+export const createChart = (seed: number, variant: Variant = SUPER_HERO): Chart => ({
   cursor: LEAD_IN_SECONDS,
   seed,
   nextId: 1,
-  busyUntil: Array(LANES).fill(0),
+  busyUntil: Array(variant.laneCount).fill(0),
 });
 
-export const extendChart = (chart: Chart, horizon: number) => {
+export const extendChart = (chart: Chart, horizon: number, variant: Variant = SUPER_HERO) => {
   const notes: Note[] = [];
   const busyUntil = [...chart.busyUntil];
   let { cursor, seed, nextId } = chart;
@@ -53,8 +47,8 @@ export const extendChart = (chart: Chart, horizon: number) => {
     const [kindValue, afterKind] = nextRandom(seed);
     const [laneValue, afterLane] = nextRandom(afterKind);
     seed = afterLane;
-    const kind = pickKind(kindValue);
-    const freeLanes = activeLanes(cursor).filter((lane) => busyUntil[lane] <= cursor);
+    const kind = pickKind(kindValue, cursor);
+    const freeLanes = activeLanes(variant, cursor).filter((lane) => busyUntil[lane] <= cursor);
 
     if (freeLanes.length) {
       const lane = freeLanes[Math.floor(laneValue * freeLanes.length)];

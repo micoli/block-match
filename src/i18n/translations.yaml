@@ -52,7 +52,7 @@ fr:
     newBest: "Nouveau record !"
     replay: "Rejouer"
   gravityHero:
-    help: "Clavier : C V B N · Écran : touche les colonnes · Maintiens les blanches"
+    help: "Clavier : {keys} · Écran : touche les colonnes · Maintiens les blanches"
     restart: "Recommencer"
     best: "Record"
     combo: "Combo"
@@ -121,7 +121,7 @@ en:
     newBest: "New best!"
     replay: "Play again"
   gravityHero:
-    help: "Keyboard: C V B N · Screen: tap the lanes · Hold the half notes"
+    help: "Keyboard: {keys} · Screen: tap the lanes · Hold the half notes"
     restart: "Restart"
     best: "Best"
     combo: "Combo"

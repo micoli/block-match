@@ -1,5 +1,5 @@
 import { LANE_KEYS } from '../hooks/useGravityHero';
-import { activeLanes } from '../game/chart';
+import { activeLanes } from '../game/variants';
 import { TRAVEL_SECONDS } from '../game/engine';
 import type { GameState } from '../game/types';
 import Lane from './Lane';
@@ -12,12 +12,12 @@ type Props = {
 };
 
 const Board = ({ state, pressed, onPress, onRelease }: Props) => {
-  const { notes, gravity, flips, time, judgment } = state;
-  const enabled = activeLanes(time + TRAVEL_SECONDS);
+  const { notes, gravity, flips, time, judgment, variant } = state;
+  const enabled = activeLanes(variant, time + TRAVEL_SECONDS);
   return (
     <div className="gh-board">
       <div key={flips} className={`gh-lanes ${flips ? 'gh-lanes--flip' : ''}`}>
-        {LANE_KEYS.map((keyLabel, index) => (
+        {LANE_KEYS.slice(0, variant.laneCount).map((keyLabel, index) => (
           <Lane
             key={keyLabel}
             index={index}
