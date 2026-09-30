@@ -1,8 +1,8 @@
 import { createRng, hashSeed } from './rng';
 import type { Gravity } from './types';
 
-const MIN_INTERVAL = 3;
-const MAX_INTERVAL = 6;
+export const MIN_INTERVAL = 3;
+export const MAX_INTERVAL = 6;
 const SCHEDULE_LENGTH = 80;
 
 // Move counts (cumulative) after which gravity flips.

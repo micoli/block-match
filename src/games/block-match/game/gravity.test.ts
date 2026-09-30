@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { createGravityFlips, gravityAfter, movesUntilFlip } from './gravity';
+import { MAX_INTERVAL, MIN_INTERVAL, createGravityFlips, gravityAfter, movesUntilFlip } from './gravity';
 
 describe('gravity schedule', () => {
-  it('flips every 5 to 10 moves, deterministically', () => {
+  it('flips at regular random intervals, deterministically', () => {
     const flips = createGravityFlips('royal', 3);
     expect(createGravityFlips('royal', 3)).toEqual(flips);
     flips.forEach((flip, i) => {
       const gap = flip - (flips[i - 1] ?? 0);
-      expect(gap).toBeGreaterThanOrEqual(5);
-      expect(gap).toBeLessThanOrEqual(10);
+      expect(gap).toBeGreaterThanOrEqual(MIN_INTERVAL);
+      expect(gap).toBeLessThanOrEqual(MAX_INTERVAL);
     });
   });
 
