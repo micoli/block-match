@@ -49,6 +49,21 @@ fr:
     gameOver: "Partie terminée"
     newBest: "Nouveau record !"
     replay: "Rejouer"
+  gravityHero:
+    help: "Clavier : C V B N · Écran : touche les colonnes · Maintiens les blanches"
+    restart: "Recommencer"
+    best: "Record"
+    combo: "Combo"
+    misses: "Ratés"
+    flipIn: "inversion dans {seconds} s"
+    judgment:
+      perfect: "Parfait !"
+      good: "Bien"
+      miss: "Raté"
+    gameOver: "Trop de ratés"
+    bestCombo: "Meilleur combo : {combo}"
+    newBest: "Nouveau record !"
+    replay: "Rejouer"
 
 en:
   common:
@@ -99,5 +114,20 @@ en:
       "3": "Triple"
       "4": "Tetris!"
     gameOver: "Game over"
+    newBest: "New best!"
+    replay: "Play again"
+  gravityHero:
+    help: "Keyboard: C V B N · Screen: tap the lanes · Hold the half notes"
+    restart: "Restart"
+    best: "Best"
+    combo: "Combo"
+    misses: "Misses"
+    flipIn: "flip in {seconds}s"
+    judgment:
+      perfect: "Perfect!"
+      good: "Good"
+      miss: "Miss"
+    gameOver: "Too many misses"
+    bestCombo: "Best combo: {combo}"
     newBest: "New best!"
     replay: "Play again"

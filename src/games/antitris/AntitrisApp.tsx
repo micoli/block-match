@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import type { GameProps } from '../../shared/types';
+import { useBestScore } from '../../shared/useBestScore';
 import { buildGameUrl } from '../../shared/url';
 import Board from './components/Board';
 import GameOverModal from './components/GameOverModal';
 import Hud from './components/Hud';
-import { useBestScore } from './hooks/useBestScore';
 import { useAntitris } from './hooks/useAntitris';
 import './styles.css';
 import { useI18n } from '../../i18n/useI18n';
@@ -15,7 +15,7 @@ const AntitrisApp = ({ seed, onHome }: GameProps) => {
   const { t } = useI18n();
   const { state, level, move, rotate, hardDrop, restart } = useAntitris(seed);
   const over = state.status === 'over';
-  const best = useBestScore(seed, state.score, over);
+  const best = useBestScore(GAME_ID, seed, state.score, over);
 
   useEffect(() => {
     window.history.replaceState(null, '', buildGameUrl(GAME_ID, { seed }));
