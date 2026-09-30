@@ -141,6 +141,41 @@ small {
   margin-bottom: 20px;
 }
 
+.map__score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 20px;
+  padding: 14px 12px;
+  border-radius: 20px;
+  background: var(--panel);
+  border: 2px solid var(--gold-dark);
+}
+
+.map__score small {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.map__score strong {
+  font-size: 2.6rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 2px 0 var(--gold-dark);
+}
+
+.map__score span {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.hud__restart {
+  margin-left: auto;
+}
+
 .map__grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
@@ -231,6 +266,29 @@ small {
   display: flex;
   flex-direction: column;
   font-size: 1.2rem;
+}
+
+.hud__score {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 4px;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.hud__score strong {
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+
+.modal__score {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.modal__score strong {
+  color: var(--gold);
+  font-size: 1.6rem;
 }
 
 .hud__panel {

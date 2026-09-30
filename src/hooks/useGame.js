@@ -5,6 +5,7 @@ import {
   areAdjacent,
   cloneBoard,
   createBoard,
+  createTile,
   findMatches,
   findPossibleMove,
   hasPossibleMove,
@@ -16,12 +17,15 @@ import {
   swapTiles,
 } from '../game/engine.js';
 import { buildEffects } from '../game/effects.js';
+import { clearPoints, remainingMovePoints } from '../game/scoring.js';
 
 const SWAP_MS = 180;
 const CLEAR_MS = 260;
 const FALL_MS = 300;
 const CONVERT_MS = 400;
 const EFFECT_MS = 520;
+const FINALE_CONVERT_MS = 250;
+const FINALE_ROCKETS = ['rocketH', 'rocketV'];
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -51,7 +55,18 @@ export const useGame = (level) => {
   const [status, setStatus] = useState('playing');
   const [busy, setBusy] = useState(false);
   const [effects, setEffects] = useState([]);
-  const live = useRef({ goals: initGoals(level), movesLeft: level.moves, status: 'playing', busy: false });
+  const [score, setScore] = useState(0);
+  const [bonus, setBonus] = useState(0);
+  const [stars, setStars] = useState(0);
+  const live = useRef({
+    goals: initGoals(level),
+    movesLeft: level.moves,
+    status: 'playing',
+    busy: false,
+    score: 0,
+    bonus: 0,
+    finale: false,
+  });
 
   const commit = () => setBoard(cloneBoard(session.board));
 
@@ -61,6 +76,14 @@ export const useGame = (level) => {
     if (patch.movesLeft !== undefined) setMovesLeft(patch.movesLeft);
     if (patch.status) setStatus(patch.status);
     if (patch.busy !== undefined) setBusy(patch.busy);
+  };
+
+  const addPoints = (points) => {
+    setLive({ score: live.current.score + points });
+    setScore(live.current.score);
+    if (!live.current.finale) return;
+    live.current.bonus += points;
+    setBonus(live.current.bonus);
   };
 
   const spawnEffects = (newEffects) => {
@@ -75,13 +98,16 @@ export const useGame = (level) => {
   const cascade = async (firstPlan) => {
     const { board: engineBoard, rng } = session;
     let plan = firstPlan;
+    let chain = 0;
     while (plan) {
+      chain++;
       spawnEffects(buildEffects(engineBoard, plan));
       markClearing(engineBoard, plan);
       commit();
       await sleep(CLEAR_MS);
       const stats = applyClear(engineBoard, plan);
       setLive({ goals: applyStatsToGoals(live.current.goals, stats) });
+      addPoints(clearPoints(plan.cleared.length, chain, stats));
       applyGravity(engineBoard, rng);
       commit();
       await sleep(FALL_MS);
@@ -94,8 +120,50 @@ export const useGame = (level) => {
     await sleep(FALL_MS);
   };
 
-  const settle = () => {
+  const explodeRemaining = async () => {
+    const engineBoard = session.board;
+    const plan = planClear(engineBoard, {
+      activations: [{ r: Math.floor(engineBoard.rows / 2), c: Math.floor(engineBoard.cols / 2), type: 'all' }],
+    });
+    spawnEffects(buildEffects(engineBoard, plan));
+    markClearing(engineBoard, plan);
+    commit();
+    await sleep(CLEAR_MS);
+    const stats = applyClear(engineBoard, plan);
+    addPoints(clearPoints(plan.cleared.length, 1, stats));
+    commit();
+    await sleep(FALL_MS);
+  };
+
+  const convertRemainingMove = () => {
+    const { board: engineBoard, rng } = session;
+    const candidates = engineBoard.tiles
+      .flatMap((row, r) => row.map((tile, c) => ({ tile, r, c })))
+      .filter(({ tile }) => tile && !tile.special);
+    if (!candidates.length) return null;
+    const { r, c } = rng.pick(candidates);
+    engineBoard.tiles[r][c] = createTile(null, rng.pick(FINALE_ROCKETS), { pop: true });
+    return { r, c };
+  };
+
+  const finale = async () => {
+    live.current.finale = true;
+    while (live.current.movesLeft > 0) {
+      const pos = convertRemainingMove();
+      if (!pos) break;
+      setLive({ movesLeft: live.current.movesLeft - 1 });
+      addPoints(remainingMovePoints());
+      commit();
+      await sleep(FINALE_CONVERT_MS);
+      await cascade(planTap(session.board, pos));
+    }
+    await explodeRemaining();
+  };
+
+  const settle = async () => {
     if (live.current.goals.every((goal) => goal.remaining === 0)) {
+      setStars(computeStars(live.current.movesLeft, level.moves));
+      await finale();
       setLive({ status: 'won', busy: false });
       return;
     }
@@ -113,7 +181,7 @@ export const useGame = (level) => {
       await sleep(CONVERT_MS);
     }
     await cascade(plan);
-    settle();
+    await settle();
   };
 
   const swap = async (from, to) => {
@@ -154,7 +222,9 @@ export const useGame = (level) => {
     status,
     busy,
     effects,
-    stars: status === 'won' ? computeStars(movesLeft, level.moves) : 0,
+    stars,
+    score,
+    bonus,
     swap,
     activate,
     hint,

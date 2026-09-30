@@ -70,7 +70,8 @@ const App = () => {
       key={`${seed}-${levelNumber}-${attempt}`}
       seed={seed}
       levelNumber={levelNumber}
-      onWin={(number, stars) => setProgress(saveLevelResult(seed, number, stars))}
+      baseScore={progress.score}
+      onWin={(number, stars, points) => setProgress(saveLevelResult(seed, number, stars, points))}
       onNext={() => play(levelNumber + 1)}
       onRetry={() => play(levelNumber)}
       onExit={() => setScreen('map')}

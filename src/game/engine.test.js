@@ -55,3 +55,12 @@ describe('cascade', () => {
     expect(colorsOf(board)).toEqual(colorsOf(run()));
   });
 });
+
+describe('finale explosion', () => {
+  it('clears every remaining tile with an all-board activation', () => {
+    const { board } = createBoard(generateLevel('royal', 9));
+    const plan = planClear(board, { activations: [{ r: 4, c: 3, type: 'all' }] });
+    applyClear(board, plan);
+    expect(board.tiles.flat().every((tile) => tile === null)).toBe(true);
+  });
+});

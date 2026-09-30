@@ -6,9 +6,10 @@ import Hud from './Hud.jsx';
 
 const HINT_DELAY_MS = 5000;
 
-const GamePlay = ({ level, seed, levelNumber, onWin, onNext, onRetry, onExit }) => {
+const GamePlay = ({ level, seed, levelNumber, baseScore, onWin, onNext, onRetry, onExit }) => {
   const game = useGame(level);
   const [hint, setHint] = useState(null);
+  const [startScore] = useState(baseScore);
 
   useEffect(() => {
     setHint(null);
@@ -18,12 +19,12 @@ const GamePlay = ({ level, seed, levelNumber, onWin, onNext, onRetry, onExit }) 
   }, [game.board, game.busy, game.status]);
 
   useEffect(() => {
-    if (game.status === 'won') onWin(levelNumber, game.stars);
+    if (game.status === 'won') onWin(levelNumber, game.stars, game.score);
   }, [game.status]);
 
   return (
     <main className="game">
-      <Hud seed={seed} levelNumber={levelNumber} movesLeft={game.movesLeft} goals={game.goals} onExit={onExit} />
+      <Hud seed={seed} levelNumber={levelNumber} movesLeft={game.movesLeft} goals={game.goals} score={game.score} totalScore={startScore + game.score} onExit={onExit} onRestart={onRetry} />
       <Board
         board={game.board}
         hint={hint}
@@ -33,7 +34,15 @@ const GamePlay = ({ level, seed, levelNumber, onWin, onNext, onRetry, onExit }) 
         onActivate={game.activate}
       />
       {game.status !== 'playing' && (
-        <EndModal status={game.status} stars={game.stars} onNext={onNext} onRetry={onRetry} onExit={onExit} />
+        <EndModal
+          status={game.status}
+          stars={game.stars}
+          score={game.score}
+          bonus={game.bonus}
+          onNext={onNext}
+          onRetry={onRetry}
+          onExit={onExit}
+        />
       )}
     </main>
   );

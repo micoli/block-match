@@ -1,3 +1,4 @@
+import { totalStars } from '../game/progress.js';
 import Stars from './Stars.jsx';
 
 const LEVELS_AHEAD = 11;
@@ -16,6 +17,13 @@ const LevelMap = ({ seed, progress, onPlay, onChangeSeed }) => {
           <small>seed : {seed}</small>
         </div>
       </header>
+      <section className="map__score" aria-label="Score total">
+        <small>Score total</small>
+        <strong>{progress.score.toLocaleString('fr-FR')}</strong>
+        <span>
+          Niveau {progress.unlocked} · ★ {totalStars(progress)}
+        </span>
+      </section>
       <ol className="map__grid">
         {Array.from({ length: count }, (_, i) => i + 1).map((number) => {
           const locked = number > progress.unlocked;

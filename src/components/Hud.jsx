@@ -1,6 +1,6 @@
 import GoalItem from './GoalItem.jsx';
 
-const Hud = ({ seed, levelNumber, movesLeft, goals, onExit }) => (
+const Hud = ({ seed, levelNumber, movesLeft, goals, score, totalScore, onExit, onRestart }) => (
   <header className="hud">
     <div className="hud__top">
       <button className="icon-button" onClick={onExit} aria-label="Retour à la carte">
@@ -10,6 +10,17 @@ const Hud = ({ seed, levelNumber, movesLeft, goals, onExit }) => (
         <strong>Niveau {levelNumber}</strong>
         <small>seed : {seed}</small>
       </div>
+      <button className="icon-button hud__restart" onClick={onRestart} aria-label="Recommencer le niveau" title="Recommencer le niveau">
+        ↺
+      </button>
+    </div>
+    <div className="hud__score">
+      <span>
+        Score <strong>{score}</strong>
+      </span>
+      <span>
+        Total <strong>{totalScore}</strong>
+      </span>
     </div>
     <div className="hud__panel">
       <div className="hud__moves">
