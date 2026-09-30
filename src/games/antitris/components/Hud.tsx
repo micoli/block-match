@@ -6,7 +6,7 @@ type Props = { state: GameState; level: number; best: number };
 
 const Hud = ({ state, level, best }: Props) => {
   const { t, formatNumber } = useI18n();
-  const { score, lines, next, gravity, flipAt, placed, lastClear } = state;
+  const { score, lines, next, gravity, gravityEnabled, flipAt, placed, lastClear } = state;
   return (
     <header className="ft-hud">
       <div className="ft-hud__stats">
@@ -19,9 +19,11 @@ const Hud = ({ state, level, best }: Props) => {
         <span>
           {t('common.level', { level })} · {t('antitris.lines')} <strong>{lines}</strong>
         </span>
-        <span className={`ft-hud__gravity ft-hud__gravity--${gravity}`}>
-          {gravity === 'down' ? '⬇' : '⬆'} <small>{t('antitris.flipIn', { pieces: flipAt - placed })}</small>
-        </span>
+        {gravityEnabled && (
+          <span className={`ft-hud__gravity ft-hud__gravity--${gravity}`}>
+            {gravity === 'down' ? '⬇' : '⬆ +25%'} <small>{t('antitris.flipIn', { pieces: flipAt - placed })}</small>
+          </span>
+        )}
       </div>
       <div className="ft-hud__next">
         <small>{t('antitris.next')}</small>

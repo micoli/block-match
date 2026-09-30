@@ -29,6 +29,7 @@ export type GameState = {
   notes: Note[];
   chart: Chart;
   gravity: Gravity;
+  gravityEnabled: boolean;
   flips: number;
   flipSeed: number;
   nextFlipAt: number;

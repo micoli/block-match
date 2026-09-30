@@ -6,7 +6,7 @@ type Props = { state: GameState; best: number };
 
 const Hud = ({ state, best }: Props) => {
   const { t, formatNumber } = useI18n();
-  const { score, combo, misses, gravity, nextFlipAt, time, judgment } = state;
+  const { score, combo, misses, gravity, gravityEnabled, nextFlipAt, time, judgment } = state;
   return (
     <header className="gh-hud">
       <div className="gh-hud__stats">
@@ -24,10 +24,12 @@ const Hud = ({ state, best }: Props) => {
         <span className={misses >= MAX_MISSES - 3 ? 'gh-hud__danger' : ''}>
           {t('gravityHero.misses')} <strong>{misses}</strong>/{MAX_MISSES}
         </span>
-        <span className={`gh-hud__gravity gh-hud__gravity--${gravity}`}>
-          {gravity === 'down' ? '⬇' : '⬆'}{' '}
-          <small>{t('gravityHero.flipIn', { seconds: Math.max(0, Math.ceil(nextFlipAt - time)) })}</small>
-        </span>
+        {gravityEnabled && (
+          <span className={`gh-hud__gravity gh-hud__gravity--${gravity}`}>
+            {gravity === 'down' ? '⬇' : '⬆ +25%'}{' '}
+            <small>{t('gravityHero.flipIn', { seconds: Math.max(0, Math.ceil(nextFlipAt - time)) })}</small>
+          </span>
+        )}
       </div>
       {judgment && (
         <p key={judgment.id} className={`gh-hud__judgment gh-hud__judgment--${judgment.type}`}>

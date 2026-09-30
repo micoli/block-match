@@ -7,6 +7,7 @@ type Props = {
   levelNumber: number;
   movesLeft: number;
   goals: GoalProgress[];
+  gravityEnabled: boolean;
   gravity: Gravity;
   movesToFlip: number | null;
   score: number;
@@ -20,6 +21,7 @@ const Hud = ({
   levelNumber,
   movesLeft,
   goals,
+  gravityEnabled,
   gravity,
   movesToFlip,
   score,
@@ -54,10 +56,12 @@ const Hud = ({
         <span>
           {t('blockMatch.hud.total')} <strong>{totalScore}</strong>
         </span>
-        <span className={`hud__gravity hud__gravity--${gravity}`} title={t('blockMatch.hud.gravity')}>
-          {gravity === 'down' ? '⬇' : '⬆'}{' '}
-          <small>{movesToFlip === null ? '' : t('blockMatch.hud.flipIn', { moves: movesToFlip })}</small>
-        </span>
+        {gravityEnabled && (
+          <span className={`hud__gravity hud__gravity--${gravity}`} title={t('blockMatch.hud.gravity')}>
+            {gravity === 'down' ? '⬇' : '⬆ +25%'}{' '}
+            <small>{movesToFlip === null ? '' : t('blockMatch.hud.flipIn', { moves: movesToFlip })}</small>
+          </span>
+        )}
       </div>
       <div className="hud__panel">
         <div className="hud__moves">

@@ -8,8 +8,8 @@ export const LANE_KEYS = ['c', 'v', 'b', 'n'];
 
 const MAX_FRAME_SECONDS = 0.1;
 
-export const useGravityHero = (seed: string) => {
-  const [state, dispatch] = useReducer(reduce, undefined, () => createGame(hashSeed(seed)));
+export const useGravityHero = (seed: string, gravityEnabled: boolean) => {
+  const [state, dispatch] = useReducer(reduce, undefined, () => createGame(hashSeed(seed), gravityEnabled));
   const [flipping, setFlipping] = useState(false);
   const [pressed, setPressed] = useState<boolean[]>(() => Array(LANES).fill(false));
   const playing = state.status === 'playing';

@@ -11,9 +11,9 @@ import { useI18n } from '../../i18n/useI18n';
 
 const GAME_ID = 'gravity-hero';
 
-const GravityHeroApp = ({ seed, onHome }: GameProps) => {
+const GravityHeroApp = ({ seed, gravityEnabled, onHome }: GameProps) => {
   const { t } = useI18n();
-  const { state, pressed, press, release, restart } = useGravityHero(seed);
+  const { state, pressed, press, release, restart } = useGravityHero(seed, gravityEnabled);
   const over = state.status === 'over';
   const best = useBestScore(GAME_ID, seed, state.score, over);
 

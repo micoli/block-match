@@ -1,12 +1,18 @@
 import { useState } from 'react';
 import { GAMES } from './games/registry';
 import { randomSeed } from './shared/seed';
+import GravityToggle from './GravityToggle';
 import LanguageSwitcher from './i18n/LanguageSwitcher';
 import { useI18n } from './i18n/useI18n';
 
-type Props = { seed: string; onStart: (gameId: string, seed: string) => void };
+type Props = {
+  seed: string;
+  gravityEnabled: boolean;
+  onGravityChange: (enabled: boolean) => void;
+  onStart: (gameId: string, seed: string) => void;
+};
 
-const Home = ({ seed, onStart }: Props) => {
+const Home = ({ seed, gravityEnabled, onGravityChange, onStart }: Props) => {
   const { t } = useI18n();
   const [value, setValue] = useState(seed);
 
@@ -39,6 +45,7 @@ const Home = ({ seed, onStart }: Props) => {
             </button>
           ))}
         </div>
+        <GravityToggle enabled={gravityEnabled} onChange={onGravityChange} />
       </form>
     </main>
   );

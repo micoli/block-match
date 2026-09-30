@@ -25,6 +25,7 @@ export type GameState = {
   flipAt: number;
   flips: number;
   gravity: Gravity;
+  gravityEnabled: boolean;
   status: Status;
   lastClear: LineClear | null;
 };

@@ -5,12 +5,12 @@ import LevelLoader from './LevelLoader';
 
 type Props = Omit<ComponentProps<typeof GamePlay>, 'level'>;
 
-const GameScreen = ({ seed, levelNumber, ...handlers }: Props) => {
+const GameScreen = ({ seed, gravityEnabled, levelNumber, ...handlers }: Props) => {
   const level = useLevel(seed, levelNumber);
 
   if (!level) return <LevelLoader levelNumber={levelNumber} onExit={handlers.onExit} />;
 
-  return <GamePlay level={level} seed={seed} levelNumber={levelNumber} {...handlers} />;
+  return <GamePlay level={level} seed={seed} gravityEnabled={gravityEnabled} levelNumber={levelNumber} {...handlers} />;
 };
 
 export default GameScreen;

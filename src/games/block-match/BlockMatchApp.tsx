@@ -19,7 +19,7 @@ const readUrlParams = () => {
 
 type Screen = 'map' | 'game';
 
-const BlockMatchApp = ({ seed, onHome }: GameProps) => {
+const BlockMatchApp = ({ seed, gravityEnabled, onHome }: GameProps) => {
   const [initial] = useState(readUrlParams);
   const [screen, setScreen] = useState<Screen>(initial.level ? 'game' : 'map');
   const [levelNumber, setLevelNumber] = useState(initial.level ?? 1);
@@ -46,6 +46,7 @@ const BlockMatchApp = ({ seed, onHome }: GameProps) => {
     <GameScreen
       key={`${seed}-${levelNumber}-${attempt}`}
       seed={seed}
+      gravityEnabled={gravityEnabled}
       levelNumber={levelNumber}
       baseScore={progress.score}
       onWin={(number, stars, points) => setProgress(saveLevelResult(seed, number, stars, points))}

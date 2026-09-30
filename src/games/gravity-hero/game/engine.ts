@@ -1,4 +1,5 @@
 import { LEAD_IN_SECONDS, createChart, extendChart } from './chart';
+import { withAntigravBonus } from '../../../shared/gravity';
 import { nextRandom } from './random';
 import type { Action, GameState, JudgmentType, Note, NoteKind } from './types';
 
@@ -25,7 +26,7 @@ const drawFlipTime = (from: number, seed: number): [number, number] => {
   return [from + FLIP_MIN_SECONDS + value * (FLIP_MAX_SECONDS - FLIP_MIN_SECONDS), nextSeed];
 };
 
-export const createGame = (seed: number): GameState => {
+export const createGame = (seed: number, gravityEnabled = true): GameState => {
   const { chart, notes } = extendChart(createChart(seed), LEAD_IN_SECONDS + TRAVEL_SECONDS);
   const [nextFlipAt, flipSeed] = drawFlipTime(0, seed ^ 0x9e3779b9);
   return {
@@ -34,6 +35,7 @@ export const createGame = (seed: number): GameState => {
     notes,
     chart,
     gravity: 'down',
+    gravityEnabled,
     flips: 0,
     flipSeed,
     nextFlipAt,
@@ -70,7 +72,7 @@ const registerMiss = (state: GameState, note: Note): GameState => {
 
 const award = (state: GameState, base: number): GameState => ({
   ...state,
-  score: state.score + base * multiplierFor(state.combo),
+  score: state.score + withAntigravBonus(base * multiplierFor(state.combo), state.gravity === 'up'),
 });
 
 const completeHold = (state: GameState, note: Note): GameState => ({
@@ -116,7 +118,7 @@ const release = (state: GameState, lane: number): GameState => {
 };
 
 const maybeFlip = (state: GameState): GameState => {
-  if (state.time < state.nextFlipAt) return state;
+  if (!state.gravityEnabled || state.time < state.nextFlipAt) return state;
   const [nextFlipAt, flipSeed] = drawFlipTime(state.time, state.flipSeed);
   return {
     ...state,
@@ -150,6 +152,6 @@ export const reduce = (state: GameState, action: Action): GameState => {
     case 'release':
       return release(state, action.lane);
     case 'restart':
-      return createGame(action.seed);
+      return createGame(action.seed, state.gravityEnabled);
   }
 };

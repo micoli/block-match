@@ -2,6 +2,7 @@ import { COLS, clearLines, collides, createBoard, dropDistance, mergePiece, shif
 import { colorOf, spawnPiece } from './pieces';
 import { drawFromBag, randomInt } from './random';
 import { HARD_DROP_POINTS_PER_ROW, levelFor, lineClearPoints } from './scoring';
+import { withAntigravBonus } from '../../../shared/gravity';
 import type { GameState } from './types';
 
 export const FLIP_MIN_PIECES = 3;
@@ -14,7 +15,7 @@ export type Action =
   | { type: 'hardDrop' }
   | { type: 'restart'; seed: number };
 
-export const createGame = (initialSeed: number): GameState => {
+export const createGame = (initialSeed: number, gravityEnabled = true): GameState => {
   const first = drawFromBag([], initialSeed);
   const second = drawFromBag(first.bag, first.seed);
   const [interval, seed] = randomInt(second.seed, FLIP_MIN_PIECES, FLIP_MAX_PIECES);
@@ -30,6 +31,7 @@ export const createGame = (initialSeed: number): GameState => {
     flipAt: interval,
     flips: 0,
     gravity: 'down',
+    gravityEnabled,
     status: 'playing',
     lastClear: null,
   };
@@ -39,9 +41,10 @@ const lockPiece = (state: GameState, bonusPoints = 0): GameState => {
   const merged = mergePiece(state.board, state.piece, colorOf(state.piece.kind));
   const { board, cleared } = clearLines(merged);
   const lines = state.lines + cleared;
-  const points = lineClearPoints(cleared, levelFor(lines));
+  const antigrav = state.gravity === 'up';
+  const points = withAntigravBonus(lineClearPoints(cleared, levelFor(lines)), antigrav);
   const placed = state.placed + 1;
-  const flipping = placed >= state.flipAt;
+  const flipping = state.gravityEnabled && placed >= state.flipAt;
   const [interval, seed] = flipping
     ? randomInt(state.seed, FLIP_MIN_PIECES, FLIP_MAX_PIECES)
     : [0, state.seed];
@@ -55,7 +58,7 @@ const lockPiece = (state: GameState, bonusPoints = 0): GameState => {
     next: drawn.kind,
     bag: drawn.bag,
     seed: drawn.seed,
-    score: state.score + bonusPoints + points,
+    score: state.score + points + withAntigravBonus(bonusPoints, antigrav),
     lines,
     placed,
     flipAt: flipping ? placed + interval : state.flipAt,
@@ -67,7 +70,7 @@ const lockPiece = (state: GameState, bonusPoints = 0): GameState => {
 };
 
 export const reduce = (state: GameState, action: Action): GameState => {
-  if (action.type === 'restart') return createGame(action.seed);
+  if (action.type === 'restart') return createGame(action.seed, state.gravityEnabled);
   if (state.status !== 'playing') return state;
 
   switch (action.type) {

@@ -10,6 +10,7 @@ const HINT_DELAY_MS = 5000;
 type Props = {
   level: Level;
   seed: string;
+  gravityEnabled: boolean;
   levelNumber: number;
   baseScore: number;
   onWin: (levelNumber: number, stars: number, points: number) => void;
@@ -18,8 +19,8 @@ type Props = {
   onExit: () => void;
 };
 
-const GamePlay = ({ level, seed, levelNumber, baseScore, onWin, onNext, onRetry, onExit }: Props) => {
-  const game = useGame(level);
+const GamePlay = ({ level, seed, gravityEnabled, levelNumber, baseScore, onWin, onNext, onRetry, onExit }: Props) => {
+  const game = useGame(level, gravityEnabled);
   const [hint, setHint] = useState<Move | null>(null);
   const [startScore] = useState(baseScore);
 
@@ -36,7 +37,7 @@ const GamePlay = ({ level, seed, levelNumber, baseScore, onWin, onNext, onRetry,
 
   return (
     <main className="game">
-      <Hud seed={seed} levelNumber={levelNumber} movesLeft={game.movesLeft} goals={game.goals} gravity={game.gravity} movesToFlip={game.movesToFlip} score={game.score} totalScore={startScore + game.score} onExit={onExit} onRestart={onRetry} />
+      <Hud seed={seed} levelNumber={levelNumber} movesLeft={game.movesLeft} goals={game.goals} gravityEnabled={gravityEnabled} gravity={game.gravity} movesToFlip={game.movesToFlip} score={game.score} totalScore={startScore + game.score} onExit={onExit} onRestart={onRetry} />
       <Board
         board={game.board}
         hint={hint}

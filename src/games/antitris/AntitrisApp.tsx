@@ -11,9 +11,9 @@ import { useI18n } from '../../i18n/useI18n';
 
 const GAME_ID = 'antitris';
 
-const AntitrisApp = ({ seed, onHome }: GameProps) => {
+const AntitrisApp = ({ seed, gravityEnabled, onHome }: GameProps) => {
   const { t } = useI18n();
-  const { state, level, move, rotate, hardDrop, restart } = useAntitris(seed);
+  const { state, level, move, rotate, hardDrop, restart } = useAntitris(seed, gravityEnabled);
   const over = state.status === 'over';
   const best = useBestScore(GAME_ID, seed, state.score, over);
 

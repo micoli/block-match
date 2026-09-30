@@ -89,3 +89,18 @@ describe('seed', () => {
     expect(play('royal-castle-1', 1).kinds).not.toEqual(play('golden-dragon-2', 1).kinds);
   });
 });
+
+describe('gravity setting', () => {
+  it('never flips when gravity is disabled', () => {
+    let state = createGame(7, false);
+    for (let i = 0; i < 10 && state.status === 'playing'; i++) state = reduce(state, { type: 'hardDrop' });
+    expect(state.flips).toBe(0);
+    expect(state.gravity).toBe('down');
+  });
+
+  it('gives 25% more points for a hard drop while flipped', () => {
+    const down = reduce(createGame(1), { type: 'hardDrop' });
+    const up = reduce({ ...createGame(1), gravity: 'up' }, { type: 'hardDrop' });
+    expect(up.score).toBe(Math.round(down.score * 1.25));
+  });
+});

@@ -5,8 +5,8 @@ import { createGame, reduce } from '../game/state';
 
 export const FLIP_ANIMATION_MS = 700;
 
-export const useAntitris = (seed: string) => {
-  const [state, dispatch] = useReducer(reduce, undefined, () => createGame(hashSeed(seed)));
+export const useAntitris = (seed: string, gravityEnabled: boolean) => {
+  const [state, dispatch] = useReducer(reduce, undefined, () => createGame(hashSeed(seed), gravityEnabled));
   const [flipping, setFlipping] = useState(false);
   const { gravity } = state;
   const level = levelFor(state.lines);

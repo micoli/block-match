@@ -18,6 +18,7 @@ import {
 } from '../game/engine';
 import { buildEffects, createVortexEffect } from '../game/effects';
 import { gravityAfter, movesUntilFlip } from '../game/gravity';
+import { withAntigravBonus } from '../../../shared/gravity';
 import { clearPoints, remainingMovePoints } from '../game/scoring';
 import type { ClearStats, Effect, Goal, GoalProgress, GameStatus, Gravity, Level, Plan, Pos, Special } from '../game/types';
 
@@ -63,7 +64,8 @@ const computeStars = (movesLeft: number, totalMoves: number) => {
   return 1;
 };
 
-export const useGame = (level: Level) => {
+export const useGame = (level: Level, gravityEnabled: boolean) => {
+  const gravityFlips = gravityEnabled ? level.gravityFlips : [];
   const [session] = useState(() => createBoard(level));
   const [board, setBoard] = useState(() => cloneBoard(session.board));
   const [goals, setGoals] = useState(() => initGoals(level));
@@ -100,7 +102,8 @@ export const useGame = (level: Level) => {
     if (patch.busy !== undefined) setBusy(patch.busy);
   };
 
-  const addPoints = (points: number) => {
+  const addPoints = (basePoints: number) => {
+    const points = withAntigravBonus(basePoints, live.current.gravity === 'up');
     setLive({ score: live.current.score + points });
     setScore(live.current.score);
     if (!live.current.finale) return;
@@ -186,7 +189,7 @@ export const useGame = (level: Level) => {
 
   const flipGravityIfDue = async () => {
     const movesPlayed = level.moves - live.current.movesLeft;
-    const next = gravityAfter(level.gravityFlips, movesPlayed);
+    const next = gravityAfter(gravityFlips, movesPlayed);
     if (next === live.current.gravity) return;
     live.current.gravity = next;
     setGravity(next);
@@ -260,7 +263,7 @@ export const useGame = (level: Level) => {
     stars,
     gravity,
     speed,
-    movesToFlip: movesUntilFlip(level.gravityFlips, level.moves - movesLeft),
+    movesToFlip: movesUntilFlip(gravityFlips, level.moves - movesLeft),
     score,
     bonus,
     swap,

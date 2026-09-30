@@ -180,3 +180,22 @@ describe('game over', () => {
     expect(reduce(over, { type: 'tick', dt: 1 })).toBe(over);
   });
 });
+
+describe('gravity setting', () => {
+  const perfectTap = (state: GameState) => {
+    const note = state.notes[0];
+    return reduce({ ...state, time: note.time }, { type: 'press', lane: note.lane });
+  };
+
+  it('never flips when gravity is disabled', () => {
+    const state = advance({ ...createGame(3, false), misses: 0 }, 20, 0.05);
+    expect(state.flips).toBe(0);
+    expect(state.gravity).toBe('down');
+  });
+
+  it('scores 25% more while flipped', () => {
+    const down = perfectTap(createGame(1));
+    const up = perfectTap({ ...createGame(1), gravity: 'up' });
+    expect(up.score).toBe(Math.round(down.score * 1.25));
+  });
+});
