@@ -1,0 +1,223 @@
+.ft-game {
+  --ft-cell: min(34px, calc((100vw - 24px) / 10), calc((100dvh - 250px) / 20));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  width: 100%;
+}
+
+.ft-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: calc(var(--ft-cell) * 10);
+}
+
+.ft-top__title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ft-top h1 {
+  font-size: 1.4rem;
+}
+
+.ft-top h1 span {
+  color: var(--gold);
+}
+
+.ft-back {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 1.3rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.ft-hud {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  width: calc(var(--ft-cell) * 10);
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: var(--panel);
+  font-size: 0.85rem;
+}
+
+.ft-hud__stats {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ft-hud__stats strong {
+  color: var(--gold);
+}
+
+.ft-hud__gravity--up {
+  color: #c4b5fd;
+}
+
+.ft-hud__next {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.ft-hud__clear {
+  position: absolute;
+  inset: auto 0 -30px;
+  margin: 0;
+  text-align: center;
+  font-weight: 700;
+  color: var(--gold);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  animation: ft-clear 1200ms ease-out forwards;
+}
+
+.ft-next {
+  display: grid;
+  grid-template-columns: repeat(var(--size), 14px);
+  grid-auto-rows: 14px;
+  gap: 1px;
+}
+
+.ft-next .ft-cell {
+  border-radius: 3px;
+}
+
+.ft-board {
+  perspective: 900px;
+  width: calc(var(--ft-cell) * var(--cols));
+  height: calc(var(--ft-cell) * var(--rows));
+  touch-action: none;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-radius: 6px;
+  background: rgba(15, 23, 60, 0.75);
+}
+
+.ft-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  grid-template-rows: repeat(var(--rows), 1fr);
+  width: 100%;
+  height: 100%;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: var(--ft-cell) var(--ft-cell);
+}
+
+.ft-grid--flip {
+  animation: ft-flip 700ms ease-in-out;
+}
+
+.ft-cell {
+  margin: 1px;
+  border-radius: 4px;
+}
+
+.ft-cell--1 { --ft-color: #22d3ee; }
+.ft-cell--2 { --ft-color: #facc15; }
+.ft-cell--3 { --ft-color: #a855f7; }
+.ft-cell--4 { --ft-color: #22c55e; }
+.ft-cell--5 { --ft-color: #ef4444; }
+.ft-cell--6 { --ft-color: #3b82f6; }
+.ft-cell--7 { --ft-color: #f97316; }
+
+.ft-cell[class*='ft-cell--'] {
+  background: linear-gradient(145deg, color-mix(in srgb, var(--ft-color) 70%, white), var(--ft-color));
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.25);
+}
+
+.ft-cell--ghost {
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: 2px solid var(--ft-color);
+  outline-offset: -2px;
+  opacity: 0.45;
+}
+
+.ft-help {
+  margin: 0;
+  max-width: calc(var(--ft-cell) * 10);
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.ft-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(10, 12, 40, 0.7);
+}
+
+.ft-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 32px;
+  border-radius: 18px;
+  background: #1e1b4b;
+  border: 2px solid var(--gold);
+  text-align: center;
+}
+
+.ft-modal p {
+  margin: 0;
+}
+
+.ft-button {
+  padding: 12px 28px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fde047, var(--gold));
+  color: #422006;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@keyframes ft-flip {
+  from {
+    transform: rotateX(180deg) scale(0.9);
+  }
+  to {
+    transform: rotateX(0) scale(1);
+  }
+}
+
+@keyframes ft-clear {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1.2);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-16px) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ft-grid--flip,
+  .ft-hud__clear {
+    animation: none;
+  }
+}

@@ -1,4 +1,5 @@
-import { createRng, hashSeed } from './rng';
+import { hashSeed } from '../../../shared/seed';
+import { createRng } from './rng';
 import type { Gravity } from './types';
 
 export const MIN_INTERVAL = 3;

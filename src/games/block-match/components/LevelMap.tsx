@@ -17,7 +17,7 @@ const LevelMap = ({ seed, progress, onPlay, onChangeSeed }: Props) => {
   return (
     <main className="screen">
       <header className="map__header">
-        <button className="icon-button" onClick={onChangeSeed} aria-label="Changer de seed">
+        <button className="icon-button" onClick={onChangeSeed} aria-label="Retour à l'accueil">
           ←
         </button>
         <div>

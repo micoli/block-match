@@ -1,18 +1,9 @@
 import { useEffect, useState } from 'react';
-import { buildGameUrl } from '../url';
+import type { GameProps } from '../../shared/types';
+import { buildGameUrl } from '../../shared/url';
 import GameScreen from './components/GameScreen';
 import LevelMap from './components/LevelMap';
-import SeedMenu from './components/SeedMenu';
-import {
-  decodeProgress,
-  encodeProgress,
-  importProgress,
-  loadLastSeed,
-  loadProgress,
-  saveLastSeed,
-  saveLevelResult,
-} from './game/progress';
-import { randomSeed } from './game/seed';
+import { decodeProgress, encodeProgress, importProgress, loadProgress, saveLevelResult } from './game/progress';
 import './styles.css';
 
 const GAME_ID = 'block-match';
@@ -21,45 +12,25 @@ const readUrlParams = () => {
   const params = new URLSearchParams(window.location.search);
   const shared = params.get('p');
   return {
-    seed: params.get('seed'),
     level: Number(params.get('level')) || null,
     shared: shared ? decodeProgress(shared) : null,
   };
 };
 
-type Screen = 'menu' | 'map' | 'game';
+type Screen = 'map' | 'game';
 
-type UrlParams = ReturnType<typeof readUrlParams>;
-
-const initialScreen = ({ seed, level }: UrlParams): Screen => {
-  if (!seed) return 'menu';
-  return level ? 'game' : 'map';
-};
-
-const BlockMatchApp = () => {
+const BlockMatchApp = ({ seed, onHome }: GameProps) => {
   const [initial] = useState(readUrlParams);
-  const [seed, setSeed] = useState(() => initial.seed ?? loadLastSeed() ?? randomSeed());
-  const [screen, setScreen] = useState<Screen>(() => initialScreen(initial));
+  const [screen, setScreen] = useState<Screen>(initial.level ? 'game' : 'map');
   const [levelNumber, setLevelNumber] = useState(initial.level ?? 1);
   const [attempt, setAttempt] = useState(0);
   const [progress, setProgress] = useState(() => (initial.shared ? importProgress(seed, initial.shared) : loadProgress(seed)));
 
   useEffect(() => {
-    if (screen === 'menu') {
-      window.history.replaceState(null, '', buildGameUrl(GAME_ID));
-      return;
-    }
     const params: Record<string, string> = { seed, p: encodeProgress(progress) };
     if (screen === 'game') params.level = String(levelNumber);
     window.history.replaceState(null, '', buildGameUrl(GAME_ID, params));
   }, [seed, screen, levelNumber, progress]);
-
-  const chooseSeed = (nextSeed: string) => {
-    setSeed(nextSeed);
-    saveLastSeed(nextSeed);
-    setProgress(loadProgress(nextSeed));
-    setScreen('map');
-  };
 
   const play = (number: number) => {
     setLevelNumber(number);
@@ -67,10 +38,8 @@ const BlockMatchApp = () => {
     setScreen('game');
   };
 
-  if (screen === 'menu') return <SeedMenu seed={seed} onSubmit={chooseSeed} />;
-
   if (screen === 'map') {
-    return <LevelMap seed={seed} progress={progress} onPlay={play} onChangeSeed={() => setScreen('menu')} />;
+    return <LevelMap seed={seed} progress={progress} onPlay={play} onChangeSeed={onHome} />;
   }
 
   return (

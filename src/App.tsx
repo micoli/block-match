@@ -1,14 +1,28 @@
-import type { ComponentType } from 'react';
-import BlockMatchApp from './games/block-match/BlockMatchApp';
-import { DEFAULT_GAME_ID, readGameId } from './games/url';
-
-const GAMES: Record<string, ComponentType> = {
-  'block-match': BlockMatchApp,
-};
+import { useEffect, useState } from 'react';
+import Home from './Home';
+import { GAMES } from './games/registry';
+import { loadLastSeed, randomSeed, saveLastSeed } from './shared/seed';
+import { readRoute } from './shared/url';
 
 const App = () => {
-  const Game = GAMES[readGameId()] ?? GAMES[DEFAULT_GAME_ID];
-  return <Game />;
+  const [initial] = useState(readRoute);
+  const [seed, setSeed] = useState(() => initial.seed ?? loadLastSeed() ?? randomSeed());
+  const [gameId, setGameId] = useState(() => GAMES.find((game) => game.id === initial.gameId)?.id ?? null);
+  const game = GAMES.find(({ id }) => id === gameId);
+
+  useEffect(() => {
+    if (!game) window.history.replaceState(null, '', window.location.pathname);
+  }, [game]);
+
+  const start = (nextGameId: string, nextSeed: string) => {
+    saveLastSeed(nextSeed);
+    setSeed(nextSeed);
+    setGameId(nextGameId);
+  };
+
+  if (!game) return <Home seed={seed} onStart={start} />;
+
+  return <game.Component key={`${game.id}-${seed}`} seed={seed} onHome={() => setGameId(null)} />;
 };
 
 export default App;

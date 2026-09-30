@@ -39,10 +39,6 @@ export const saveLevelResult = (seed: string, levelNumber: number, stars: number
   return next;
 };
 
-export const loadLastSeed = () => readJson<string | null>(`${PREFIX}:last-seed`, null);
-
-export const saveLastSeed = (seed: string) => writeJson(`${PREFIX}:last-seed`, seed);
-
 export const totalStars = (progress: Progress) => Object.values(progress.stars).reduce((sum, count) => sum + count, 0);
 
 export const encodeProgress = (progress: Progress) => {

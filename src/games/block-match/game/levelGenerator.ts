@@ -1,7 +1,8 @@
 import type { Goal, Grid, Level, Rng } from './types';
 import { createGravityFlips } from './gravity';
 import { createGrid, setMirrored } from './grid';
-import { createRng, hashSeed } from './rng';
+import { hashSeed } from '../../../shared/seed';
+import { createRng } from './rng';
 import { solve } from './solver';
 
 const DIFFICULTY_RAMP = 60;
