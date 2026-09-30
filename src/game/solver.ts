@@ -63,7 +63,8 @@ const listMoves = (board: Board) => {
   return moves;
 };
 
-const tryMove = (state: State, move: SolverMove, goals: Goal[]): State | null => {
+const tryMove = (state: State, move: SolverMove, level: Level): State | null => {
+  const { goals } = level;
   const board = cloneBoard(state.board);
   const rng = cloneRng(state.rng);
   let plan: Plan | null;
@@ -85,10 +86,11 @@ const countSpecials = (board: Board) => board.tiles.flat().filter((tile) => tile
 
 const score = (state: State, goals: Goal[]) => -progressOf(state.remaining, goals) * 10 + countSpecials(state.board);
 
-const bestMove = (state: State, goals: Goal[]) => {
+const bestMove = (state: State, level: Level) => {
+  const { goals } = level;
   let best: { value: number; next: State } | null = null;
   for (const move of listMoves(state.board)) {
-    const next = tryMove(state, move, goals);
+    const next = tryMove(state, move, level);
     if (!next) continue;
     const value = score(next, goals);
     if (!best || value > best.value) best = { value, next };
@@ -103,7 +105,7 @@ export const solve = (level: Level, maxMoves: number): number | null => {
   const goals = level.goals;
   let state: State = { board, rng, remaining: goals.map((goal) => goal.target) };
   for (let moves = 1; moves <= maxMoves; moves++) {
-    const next = bestMove(state, goals);
+    const next = bestMove(state, level);
     if (!next) return null;
     state = next;
     if (state.remaining.every((left) => left === 0)) return moves;

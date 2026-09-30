@@ -16,9 +16,10 @@ import {
   shuffleBoard,
   swapTiles,
 } from '../game/engine';
-import { buildEffects } from '../game/effects';
+import { buildEffects, createVortexEffect } from '../game/effects';
+import { gravityAfter, movesUntilFlip } from '../game/gravity';
 import { clearPoints, remainingMovePoints } from '../game/scoring';
-import type { ClearStats, Effect, Goal, GoalProgress, GameStatus, Level, Plan, Pos, Special } from '../game/types';
+import type { ClearStats, Effect, Goal, GoalProgress, GameStatus, Gravity, Level, Plan, Pos, Special } from '../game/types';
 
 type Live = {
   goals: GoalProgress[];
@@ -28,6 +29,8 @@ type Live = {
   score: number;
   bonus: number;
   finale: boolean;
+  speed: number;
+  gravity: Gravity;
 };
 
 const SWAP_MS = 180;
@@ -35,7 +38,9 @@ const CLEAR_MS = 260;
 const FALL_MS = 300;
 const CONVERT_MS = 400;
 const EFFECT_MS = 520;
+const VORTEX_MS = 1000;
 const FINALE_CONVERT_MS = 250;
+const FINALE_SPEED = 2;
 const FINALE_ROCKETS: Special[] = ['rocketH', 'rocketV'];
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -69,6 +74,8 @@ export const useGame = (level: Level) => {
   const [score, setScore] = useState(0);
   const [bonus, setBonus] = useState(0);
   const [stars, setStars] = useState(0);
+  const [speed, setSpeed] = useState(1);
+  const [gravity, setGravity] = useState<Gravity>('down');
   const live = useRef<Live>({
     goals: initGoals(level),
     movesLeft: level.moves,
@@ -77,7 +84,11 @@ export const useGame = (level: Level) => {
     score: 0,
     bonus: 0,
     finale: false,
+    speed: 1,
+    gravity: 'down',
   });
+
+  const wait = (ms: number) => sleep(ms / live.current.speed);
 
   const commit = () => setBoard(cloneBoard(session.board));
 
@@ -97,11 +108,11 @@ export const useGame = (level: Level) => {
     setBonus(live.current.bonus);
   };
 
-  const spawnEffects = (newEffects: Effect[]) => {
+  const spawnEffects = (newEffects: Effect[], durationMs = EFFECT_MS) => {
     if (!newEffects.length) return;
     const ids = new Set(newEffects.map((effect) => effect.id));
     setEffects((current) => [...current, ...newEffects]);
-    setTimeout(() => setEffects((current) => current.filter((effect) => !ids.has(effect.id))), EFFECT_MS);
+    setTimeout(() => setEffects((current) => current.filter((effect) => !ids.has(effect.id))), durationMs / live.current.speed);
   };
 
   const canAct = () => live.current.status === 'playing' && !live.current.busy;
@@ -115,20 +126,20 @@ export const useGame = (level: Level) => {
       spawnEffects(buildEffects(engineBoard, plan));
       markClearing(engineBoard, plan);
       commit();
-      await sleep(CLEAR_MS);
+      await wait(CLEAR_MS);
       const stats = applyClear(engineBoard, plan);
       setLive({ goals: applyStatsToGoals(live.current.goals, stats) });
       addPoints(clearPoints(plan.cleared.length, chain, stats));
       applyGravity(engineBoard, rng);
       commit();
-      await sleep(FALL_MS);
+      await wait(FALL_MS);
       const groups = findMatches(engineBoard);
       plan = groups.length ? planClear(engineBoard, { groups }) : null;
     }
     if (hasPossibleMove(engineBoard)) return;
     shuffleBoard(engineBoard, rng);
     commit();
-    await sleep(FALL_MS);
+    await wait(FALL_MS);
   };
 
   const explodeRemaining = async () => {
@@ -139,11 +150,11 @@ export const useGame = (level: Level) => {
     spawnEffects(buildEffects(engineBoard, plan));
     markClearing(engineBoard, plan);
     commit();
-    await sleep(CLEAR_MS);
+    await wait(CLEAR_MS);
     const stats = applyClear(engineBoard, plan);
     addPoints(clearPoints(plan.cleared.length, 1, stats));
     commit();
-    await sleep(FALL_MS);
+    await wait(FALL_MS);
   };
 
   const convertRemainingMove = () => {
@@ -159,16 +170,28 @@ export const useGame = (level: Level) => {
 
   const finale = async () => {
     live.current.finale = true;
+    live.current.speed = FINALE_SPEED;
+    setSpeed(FINALE_SPEED);
     while (live.current.movesLeft > 0) {
       const pos = convertRemainingMove();
       if (!pos) break;
       setLive({ movesLeft: live.current.movesLeft - 1 });
       addPoints(remainingMovePoints());
       commit();
-      await sleep(FINALE_CONVERT_MS);
+      await wait(FINALE_CONVERT_MS);
       await cascade(planTap(session.board, pos));
     }
     await explodeRemaining();
+  };
+
+  const flipGravityIfDue = async () => {
+    const movesPlayed = level.moves - live.current.movesLeft;
+    const next = gravityAfter(level.gravityFlips, movesPlayed);
+    if (next === live.current.gravity) return;
+    live.current.gravity = next;
+    setGravity(next);
+    spawnEffects([createVortexEffect(next)], VORTEX_MS);
+    await wait(VORTEX_MS);
   };
 
   const settle = async () => {
@@ -182,6 +205,7 @@ export const useGame = (level: Level) => {
       setLive({ status: 'lost', busy: false });
       return;
     }
+    await flipGravityIfDue();
     setLive({ busy: false });
   };
 
@@ -189,7 +213,7 @@ export const useGame = (level: Level) => {
     setLive({ movesLeft: live.current.movesLeft - 1 });
     if (plan.converted) {
       commit();
-      await sleep(CONVERT_MS);
+      await wait(CONVERT_MS);
     }
     await cascade(plan);
     await settle();
@@ -203,7 +227,7 @@ export const useGame = (level: Level) => {
     setLive({ busy: true });
     swapTiles(engineBoard, from, to);
     commit();
-    await sleep(SWAP_MS);
+    await wait(SWAP_MS);
 
     const plan = resolveSwap(engineBoard, from, to, session.rng);
     if (plan) {
@@ -212,7 +236,7 @@ export const useGame = (level: Level) => {
     }
     swapTiles(engineBoard, from, to);
     commit();
-    await sleep(SWAP_MS);
+    await wait(SWAP_MS);
     setLive({ busy: false });
   };
 
@@ -234,6 +258,9 @@ export const useGame = (level: Level) => {
     busy,
     effects,
     stars,
+    gravity,
+    speed,
+    movesToFlip: movesUntilFlip(level.gravityFlips, level.moves - movesLeft),
     score,
     bonus,
     swap,

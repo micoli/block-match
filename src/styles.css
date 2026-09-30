@@ -423,7 +423,7 @@ small {
 
 .tile-slot {
   pointer-events: none;
-  transition: transform 240ms cubic-bezier(0.45, 0, 0.55, 1.15);
+  transition: transform calc(240ms / var(--speed, 1)) cubic-bezier(0.45, 0, 0.55, 1.15);
 }
 
 .tile {
@@ -435,11 +435,11 @@ small {
 }
 
 .tile--drop {
-  animation: tile-drop 300ms cubic-bezier(0.5, 0, 0.75, 1) both;
+  animation: tile-drop calc(300ms / var(--speed, 1)) cubic-bezier(0.5, 0, 0.75, 1) both;
 }
 
 .tile--pop {
-  animation: tile-pop 300ms ease-out;
+  animation: tile-pop calc(300ms / var(--speed, 1)) ease-out;
 }
 
 .tile--selected {
@@ -455,7 +455,7 @@ small {
 }
 
 .tile--clearing {
-  animation: tile-clear 260ms cubic-bezier(0.3, 0, 0.7, 1) forwards;
+  animation: tile-clear calc(260ms / var(--speed, 1)) cubic-bezier(0.3, 0, 0.7, 1) forwards;
 }
 
 .gem {
@@ -567,7 +567,7 @@ small {
 
 @keyframes tile-drop {
   from {
-    transform: translateY(calc(var(--drop) * var(--cell) * -1));
+    transform: translateY(calc(var(--drop) * var(--cell) * -1 * var(--gravity, 1)));
   }
 }
 
@@ -619,7 +619,7 @@ small {
 /* ---------- destruction effects ---------- */
 
 .board--shake {
-  animation: board-shake 320ms ease-out;
+  animation: board-shake calc(320ms / var(--speed, 1)) ease-out;
 }
 
 .fx-layer {
@@ -650,7 +650,7 @@ small {
   inset: 10%;
   border-radius: 50%;
   background: radial-gradient(circle, #fff 0 18%, var(--fx-light) 38%, transparent 70%);
-  animation: fx-flash 300ms ease-out forwards;
+  animation: fx-flash calc(300ms / var(--speed, 1)) ease-out forwards;
 }
 
 .fx-burst__ring {
@@ -658,7 +658,7 @@ small {
   inset: 12%;
   border-radius: 50%;
   border: calc(var(--cell) * 0.08) solid var(--fx);
-  animation: fx-ring 420ms ease-out forwards;
+  animation: fx-ring calc(420ms / var(--speed, 1)) ease-out forwards;
 }
 
 .fx-burst__shard {
@@ -671,7 +671,7 @@ small {
   background: var(--fx);
   box-shadow: 0 0 6px var(--fx-light);
   clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
-  animation: fx-shard 500ms cubic-bezier(0.15, 0.7, 0.4, 1) forwards;
+  animation: fx-shard calc(500ms / var(--speed, 1)) cubic-bezier(0.15, 0.7, 0.4, 1) forwards;
 }
 
 .fx-burst__shard:nth-child(odd) {
@@ -685,7 +685,7 @@ small {
   inset: 0;
   border-radius: 50%;
   background: radial-gradient(circle, var(--dust) 0 30%, transparent 70%);
-  animation: fx-dust 450ms ease-out forwards;
+  animation: fx-dust calc(450ms / var(--speed, 1)) ease-out forwards;
 }
 
 .fx-shatter__piece {
@@ -697,7 +697,7 @@ small {
   margin: calc(var(--cell) * -0.08) calc(var(--cell) * -0.12);
   background: var(--piece);
   box-shadow: inset 0 -2px 0 var(--piece-dark);
-  animation: fx-debris 500ms cubic-bezier(0.2, 0.6, 0.5, 1) forwards;
+  animation: fx-debris calc(500ms / var(--speed, 1)) cubic-bezier(0.2, 0.6, 0.5, 1) forwards;
 }
 
 .fx-shatter--wood {
@@ -749,14 +749,14 @@ small {
   inset: 32% 0;
   background: linear-gradient(90deg, transparent, #fff7ae 15%, #fff 50%, #fff7ae 85%, transparent);
   transform-origin: calc((var(--oc) + 0.5) * var(--cell)) 50%;
-  animation: fx-beam-h 460ms ease-out forwards;
+  animation: fx-beam-h calc(460ms / var(--speed, 1)) ease-out forwards;
 }
 
 .fx-beam--v .fx-beam__ray {
   inset: 0 32%;
   background: linear-gradient(180deg, transparent, #fff7ae 15%, #fff 50%, #fff7ae 85%, transparent);
   transform-origin: 50% calc((var(--or) + 0.5) * var(--cell));
-  animation: fx-beam-v 460ms ease-out forwards;
+  animation: fx-beam-v calc(460ms / var(--speed, 1)) ease-out forwards;
 }
 
 .fx-beam__rocket {
@@ -767,7 +767,7 @@ small {
   place-items: center;
   font-size: calc(var(--cell) * 0.6);
   filter: drop-shadow(0 0 6px #fde047);
-  animation-duration: 460ms;
+  animation-duration: calc(460ms / var(--speed, 1));
   animation-timing-function: cubic-bezier(0.4, 0, 1, 1);
   animation-fill-mode: forwards;
 }
@@ -800,13 +800,13 @@ small {
 
 .fx-shock__core {
   background: radial-gradient(circle, #fff 0 12%, #fde047 28%, #f97316 50%, rgba(220, 38, 38, 0.5) 65%, transparent 72%);
-  animation: fx-shock-core 420ms ease-out forwards;
+  animation: fx-shock-core calc(420ms / var(--speed, 1)) ease-out forwards;
 }
 
 .fx-shock__wave {
   border: calc(var(--cell) * 0.12) solid rgba(255, 237, 213, 0.9);
   box-shadow: 0 0 20px #fb923c;
-  animation: fx-shock-wave 500ms ease-out forwards;
+  animation: fx-shock-wave calc(500ms / var(--speed, 1)) ease-out forwards;
 }
 
 .fx-lightning {
@@ -825,14 +825,14 @@ small {
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-dasharray: 1;
-  animation: fx-bolt 480ms ease-out forwards;
+  animation: fx-bolt calc(480ms / var(--speed, 1)) ease-out forwards;
 }
 
 .fx-lightning__orb {
   fill: #e9d5ff;
   transform-box: fill-box;
   transform-origin: center;
-  animation: fx-orb 480ms ease-out forwards;
+  animation: fx-orb calc(480ms / var(--speed, 1)) ease-out forwards;
 }
 
 @keyframes fx-flash {
@@ -1062,5 +1062,81 @@ small {
   .loader__cell {
     animation: none;
     opacity: 0.6;
+  }
+}
+
+/* ---------- gravity flip ---------- */
+
+.hud__gravity small {
+  opacity: 0.75;
+}
+
+.hud__gravity--up {
+  color: #c4b5fd;
+}
+
+.board--vortex {
+  animation: board-whirl 1000ms ease-in-out;
+}
+
+.fx-vortex {
+  --dir: 1;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  animation: fx-vortex-fade 1000ms ease-in-out both;
+}
+
+.fx-vortex--up {
+  --dir: -1;
+}
+
+.fx-vortex__ring {
+  position: absolute;
+  width: calc(30% + var(--i) * 25%);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 6px solid transparent;
+  border-top-color: #c4b5fd;
+  border-right-color: rgba(125, 211, 252, 0.7);
+  filter: drop-shadow(0 0 8px #8b5cf6);
+  animation: fx-vortex-ring 1000ms ease-in-out both;
+  animation-delay: calc(var(--i) * 60ms);
+}
+
+.fx-vortex__core {
+  width: 18%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 20%, #a78bfa 45%, transparent 70%);
+  animation: fx-vortex-core 1000ms ease-in-out both;
+}
+
+@keyframes board-whirl {
+  0% { transform: rotate(0) scale(1); }
+  50% { transform: rotate(calc(var(--gravity, 1) * 180deg)) scale(0.82); }
+  100% { transform: rotate(calc(var(--gravity, 1) * 360deg)) scale(1); }
+}
+
+@keyframes fx-vortex-fade {
+  0%, 100% { opacity: 0; }
+  25%, 70% { opacity: 1; }
+}
+
+@keyframes fx-vortex-ring {
+  from { transform: rotate(0) scale(1.5); }
+  to { transform: rotate(calc(var(--dir) * 900deg)) scale(0.25); }
+}
+
+@keyframes fx-vortex-core {
+  0% { transform: scale(0); }
+  50% { transform: scale(2.2); }
+  100% { transform: scale(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .board--vortex {
+    animation: none;
   }
 }

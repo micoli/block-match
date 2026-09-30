@@ -1,4 +1,4 @@
-import type { ActivationType, Board, Effect, Plan } from './types';
+import type { ActivationType, Board, Effect, Gravity, Plan } from './types';
 
 type DistributiveOmit<T, K extends keyof T> = T extends unknown ? Omit<T, K> : never;
 
@@ -20,6 +20,8 @@ const BEAMS: Partial<Record<ActivationType, { dir: 'h' | 'v'; offset: number }[]
 const SHOCK_RADIUS: Partial<Record<ActivationType, number>> = { bomb: 2.5, bigBomb: 3.5 };
 
 const LIGHTNING_TYPES: ActivationType[] = ['color', 'lightball'];
+
+export const createVortexEffect = (gravity: Gravity): Effect => ({ id: nextEffectId++, kind: 'vortex', gravity });
 
 // Must run before the plan is applied: it reads the tiles about to be destroyed.
 export const buildEffects = (board: Board, plan: Plan) => {

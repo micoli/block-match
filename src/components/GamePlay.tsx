@@ -36,11 +36,13 @@ const GamePlay = ({ level, seed, levelNumber, baseScore, onWin, onNext, onRetry,
 
   return (
     <main className="game">
-      <Hud seed={seed} levelNumber={levelNumber} movesLeft={game.movesLeft} goals={game.goals} score={game.score} totalScore={startScore + game.score} onExit={onExit} onRestart={onRetry} />
+      <Hud seed={seed} levelNumber={levelNumber} movesLeft={game.movesLeft} goals={game.goals} gravity={game.gravity} movesToFlip={game.movesToFlip} score={game.score} totalScore={startScore + game.score} onExit={onExit} onRestart={onRetry} />
       <Board
         board={game.board}
         hint={hint}
         effects={game.effects}
+        gravity={game.gravity}
+        speed={game.speed}
         disabled={game.busy || game.status !== 'playing'}
         onSwap={game.swap}
         onActivate={game.activate}

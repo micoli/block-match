@@ -1,4 +1,4 @@
-import type { GoalProgress } from '../game/types';
+import type { GoalProgress, Gravity } from '../game/types';
 import GoalItem from './GoalItem';
 
 type Props = {
@@ -6,13 +6,15 @@ type Props = {
   levelNumber: number;
   movesLeft: number;
   goals: GoalProgress[];
+  gravity: Gravity;
+  movesToFlip: number | null;
   score: number;
   totalScore: number;
   onExit: () => void;
   onRestart: () => void;
 };
 
-const Hud = ({ seed, levelNumber, movesLeft, goals, score, totalScore, onExit, onRestart }: Props) => (
+const Hud = ({ seed, levelNumber, movesLeft, goals, gravity, movesToFlip, score, totalScore, onExit, onRestart }: Props) => (
   <header className="hud">
     <div className="hud__top">
       <button className="icon-button" onClick={onExit} aria-label="Retour à la carte">
@@ -32,6 +34,9 @@ const Hud = ({ seed, levelNumber, movesLeft, goals, score, totalScore, onExit, o
       </span>
       <span>
         Total <strong>{totalScore}</strong>
+      </span>
+      <span className={`hud__gravity hud__gravity--${gravity}`} title="Gravité">
+        {gravity === 'down' ? '⬇' : '⬆'} <small>{movesToFlip === null ? '' : `inversion dans ${movesToFlip}`}</small>
       </span>
     </div>
     <div className="hud__panel">

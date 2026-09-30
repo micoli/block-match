@@ -1,4 +1,5 @@
 import type { Goal, Grid, Level, Rng } from './types';
+import { createGravityFlips } from './gravity';
 import { createGrid, setMirrored } from './grid';
 import { createRng, hashSeed } from './rng';
 import { solve } from './solver';
@@ -210,6 +211,7 @@ export const generateLevel = (seed: string, number: number): Level => {
     goals,
     moves: computeMoves(goals, boxes, ice, colors, difficulty),
     tileSeed: hashSeed(`${seed}:tiles:${number}`),
+    gravityFlips: createGravityFlips(seed, number),
   };
   return withWinnableBudget(level);
 };

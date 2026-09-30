@@ -1,3 +1,5 @@
+export type Gravity = 'down' | 'up';
+
 export type Pos = { r: number; c: number };
 
 export type Special = 'rocketH' | 'rocketV' | 'bomb' | 'lightball';
@@ -45,6 +47,7 @@ export type Level = {
   goals: Goal[];
   moves: number;
   tileSeed: number;
+  gravityFlips: number[];
 };
 
 export type Rng = {
@@ -97,6 +100,7 @@ export type Effect =
   | { id: number; kind: 'shatter'; r: number; c: number; material: 'ice' | 'wood'; broken: boolean }
   | { id: number; kind: 'beam'; dir: 'h' | 'v'; r: number; c: number; originR: number; originC: number }
   | { id: number; kind: 'shockwave'; r: number; c: number; radius: number }
-  | { id: number; kind: 'lightning'; r: number; c: number; targets: Pos[] };
+  | { id: number; kind: 'lightning'; r: number; c: number; targets: Pos[] }
+  | { id: number; kind: 'vortex'; gravity: Gravity };
 
 export type EffectOf<K extends Effect['kind']> = Extract<Effect, { kind: K }>;

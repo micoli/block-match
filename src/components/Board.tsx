@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import type { PointerEvent } from 'react';
-import type { Board as BoardData, Effect, Move, Pos } from '../game/types';
+import type { Board as BoardData, Effect, Gravity, Move, Pos } from '../game/types';
 import BoardCell from './BoardCell';
 import EffectsLayer from './effects/EffectsLayer';
 import Tile from './Tile';
@@ -19,21 +19,25 @@ type Props = {
   board: BoardData;
   hint: Move | null;
   effects: Effect[];
+  gravity: Gravity;
+  speed: number;
   disabled: boolean;
   onSwap: (from: Pos, to: Pos) => void;
   onActivate: (cell: Pos) => void;
 };
 
-const Board = ({ board, hint, effects, disabled, onSwap, onActivate }: Props) => {
+const Board = ({ board, hint, effects, gravity, speed, disabled, onSwap, onActivate }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<Drag | null>(null);
   const [selected, setSelected] = useState<Pos | null>(null);
+  const flipped = gravity === 'up';
+  const displayRow = (r: number) => (flipped ? board.rows - 1 - r : r);
 
   const cellFromEvent = (event: PointerEvent) => {
     const rect = containerRef.current!.getBoundingClientRect();
     const size = rect.width / board.cols;
     return {
-      r: Math.floor((event.clientY - rect.top) / size),
+      r: displayRow(Math.floor((event.clientY - rect.top) / size)),
       c: Math.floor((event.clientX - rect.left) / size),
       size,
     };
@@ -72,7 +76,7 @@ const Board = ({ board, hint, effects, disabled, onSwap, onActivate }: Props) =>
     const target =
       Math.abs(dx) > Math.abs(dy)
         ? { r: drag.cell.r, c: drag.cell.c + Math.sign(dx) }
-        : { r: drag.cell.r + Math.sign(dy), c: drag.cell.c };
+        : { r: drag.cell.r + Math.sign(dy) * (flipped ? -1 : 1), c: drag.cell.c };
     setSelected(null);
     onSwap(drag.cell, target);
   };
@@ -89,7 +93,7 @@ const Board = ({ board, hint, effects, disabled, onSwap, onActivate }: Props) =>
   for (let r = 0; r < board.rows; r++) {
     for (let c = 0; c < board.cols; c++) {
       if (board.holes[r][c]) continue;
-      cells.push(<BoardCell key={`${r}-${c}`} row={r} col={c} ice={board.ice[r][c]} box={board.boxes[r][c]} />);
+      cells.push(<BoardCell key={`${r}-${c}`} row={displayRow(r)} col={c} ice={board.ice[r][c]} box={board.boxes[r][c]} />);
       const tile = board.tiles[r][c];
       if (!tile) continue;
       const cell = { r, c };
@@ -97,7 +101,7 @@ const Board = ({ board, hint, effects, disabled, onSwap, onActivate }: Props) =>
         <Tile
           key={tile.id}
           tile={tile}
-          row={r}
+          row={displayRow(r)}
           col={c}
           selected={isSameCell(selected, cell)}
           hinted={isSameCell(hint?.from, cell) || isSameCell(hint?.to, cell)}
@@ -109,8 +113,8 @@ const Board = ({ board, hint, effects, disabled, onSwap, onActivate }: Props) =>
   return (
     <div
       ref={containerRef}
-      className={`board ${effects.some((effect) => effect.kind === 'shockwave') ? 'board--shake' : ''}`}
-      style={{ '--rows': board.rows, '--cols': board.cols }}
+      className={`board ${effects.some((effect) => effect.kind === 'shockwave') ? 'board--shake' : ''} ${effects.some((effect) => effect.kind === 'vortex') ? 'board--vortex' : ''}`}
+      style={{ '--rows': board.rows, '--cols': board.cols, '--gravity': gravity === 'down' ? 1 : -1, '--speed': speed }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
@@ -118,7 +122,7 @@ const Board = ({ board, hint, effects, disabled, onSwap, onActivate }: Props) =>
     >
       {cells}
       {tiles}
-      <EffectsLayer effects={effects} rows={board.rows} cols={board.cols} />
+      <EffectsLayer effects={effects} flipped={flipped} rows={board.rows} cols={board.cols} />
     </div>
   );
 };
