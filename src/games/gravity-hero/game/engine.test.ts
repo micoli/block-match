@@ -89,6 +89,7 @@ describe('judging', () => {
     const ready = reduce(start, { type: 'tick', dt: note.time });
     const hit = reduce(ready, { type: 'press', lane: note.lane });
     expect(hit.judgment?.type).toBe('perfect');
+    expect(hit.judgment?.kind).toBe(note.kind);
     expect(hit.score).toBeGreaterThan(0);
     expect(hit.combo).toBe(1);
     expect(hit.notes.find(({ id }) => id === note.id)).toBeUndefined();

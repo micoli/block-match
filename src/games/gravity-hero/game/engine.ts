@@ -52,9 +52,10 @@ export const createGame = (seed: number, gravityEnabled = true, variant: Variant
   };
 };
 
-const judge = (state: GameState, lane: number, type: JudgmentType) => ({
+const judge = (state: GameState, note: Note, type: JudgmentType) => ({
   id: (state.judgment?.id ?? 0) + 1,
-  lane,
+  lane: note.lane,
+  kind: note.kind,
   type,
 });
 
@@ -68,7 +69,7 @@ const registerMiss = (state: GameState, note: Note): GameState => {
     misses,
     combo: 0,
     perfectStreak: 0,
-    judgment: judge(state, note.lane, 'miss'),
+    judgment: judge(state, note, 'miss'),
     status: misses >= MAX_MISSES ? 'over' : state.status,
   };
 };
@@ -105,7 +106,7 @@ const press = (state: GameState, lane: number): GameState => {
     misses: recovered ? Math.max(0, state.misses - 1) : state.misses,
     hits: state.hits + 1,
     bestCombo: Math.max(state.bestCombo, combo),
-    judgment: judge(state, lane, type),
+    judgment: judge(state, note, type),
     notes: note.duration
       ? state.notes.map((candidate) => (candidate.id === note.id ? { ...candidate, status: 'holding' } : candidate))
       : withoutNote(state, note),

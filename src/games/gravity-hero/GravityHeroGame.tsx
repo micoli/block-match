@@ -2,11 +2,13 @@ import { useEffect } from 'react';
 import type { GameProps } from '../../shared/types';
 import type { Variant } from './game/variants';
 import { buildGameUrl } from '../../shared/url';
+import { useSoundMuted } from '../../shared/useSoundMuted';
 import { useBestScore } from '../../shared/useBestScore';
 import Board from './components/Board';
 import GameOverModal from './components/GameOverModal';
 import Hud from './components/Hud';
 import { LANE_KEYS, useGravityHero } from './hooks/useGravityHero';
+import { useGravityHeroAudio } from './hooks/useGravityHeroAudio';
 import './styles.css';
 import { useI18n } from '../../i18n/useI18n';
 
@@ -15,6 +17,8 @@ type Props = GameProps & { variant: Variant };
 const GravityHeroGame = ({ seed, gravityEnabled, variant, onHome }: Props) => {
   const { t } = useI18n();
   const { state, pressed, press, release, restart } = useGravityHero(seed, gravityEnabled, variant);
+  const [muted, setMuted] = useSoundMuted();
+  useGravityHeroAudio(state, muted);
   const over = state.status === 'over';
   const best = useBestScore(variant.id, seed, state.score, over);
 
@@ -34,9 +38,19 @@ const GravityHeroGame = ({ seed, gravityEnabled, variant, onHome }: Props) => {
           </h1>
           <small>{t('common.seed', { seed })}</small>
         </div>
-        <button className="gh-back" onClick={restart} aria-label={t('gravityHero.restart')} title={t('gravityHero.restart')}>
-          ↺
-        </button>
+        <div className="gh-top__actions">
+          <button
+            className="gh-back"
+            onClick={() => setMuted(!muted)}
+            aria-label={t(muted ? 'gravityHero.unmute' : 'gravityHero.mute')}
+            title={t(muted ? 'gravityHero.unmute' : 'gravityHero.mute')}
+          >
+            {muted ? '🔇' : '🔊'}
+          </button>
+          <button className="gh-back" onClick={restart} aria-label={t('gravityHero.restart')} title={t('gravityHero.restart')}>
+            ↺
+          </button>
+        </div>
       </div>
       <Hud state={state} best={best} />
       <Board state={state} pressed={pressed} onPress={press} onRelease={release} />

@@ -12,9 +12,10 @@
 .gh-top {
   position: relative;
   z-index: 10;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 6px;
   align-items: center;
-  justify-content: space-between;
   width: calc(var(--gh-lane) * var(--gh-lanes));
   min-width: 280px;
 }
@@ -26,7 +27,8 @@
 }
 
 .gh-top h1 {
-  font-size: 1.4rem;
+  font-size: 1rem;
+  white-space: nowrap;
 }
 
 .gh-top h1 span {
@@ -323,4 +325,10 @@
   .gh-flash {
     animation: none;
   }
+}
+
+.gh-top__actions {
+  display: flex;
+  justify-self: end;
+  gap: 6px;
 }

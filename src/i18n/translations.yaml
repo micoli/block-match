@@ -54,6 +54,8 @@ fr:
   gravityHero:
     help: "Clavier : {keys} · Écran : touche les colonnes · Maintiens les blanches"
     restart: "Recommencer"
+    mute: "Couper le son"
+    unmute: "Activer le son"
     best: "Record"
     combo: "Combo"
     misses: "Ratés"
@@ -123,6 +125,8 @@ en:
   gravityHero:
     help: "Keyboard: {keys} · Screen: tap the lanes · Hold the half notes"
     restart: "Restart"
+    mute: "Mute"
+    unmute: "Unmute"
     best: "Best"
     combo: "Combo"
     misses: "Misses"

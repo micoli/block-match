@@ -14,7 +14,7 @@ export type Note = {
   status: NoteStatus;
 };
 
-export type Judgment = { id: number; lane: number; type: JudgmentType };
+export type Judgment = { id: number; lane: number; kind: NoteKind; type: JudgmentType };
 
 export type Chart = {
   cursor: number;
