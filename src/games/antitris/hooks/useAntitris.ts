@@ -8,6 +8,7 @@ export const FLIP_ANIMATION_MS = 700;
 export const useAntitris = (seed: string) => {
   const [state, dispatch] = useReducer(reduce, undefined, () => createGame(hashSeed(seed)));
   const [flipping, setFlipping] = useState(false);
+  const { gravity } = state;
   const level = levelFor(state.lines);
   const active = state.status === 'playing' && !flipping;
 
@@ -31,11 +32,12 @@ export const useAntitris = (seed: string) => {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      const flipped = gravity === 'up';
       const handlers: Record<string, () => void> = {
         ArrowLeft: () => move(-1),
         ArrowRight: () => move(1),
-        ArrowUp: rotate,
-        ArrowDown: hardDrop,
+        ArrowUp: flipped ? hardDrop : rotate,
+        ArrowDown: flipped ? rotate : hardDrop,
         ' ': hardDrop,
       };
       const handler = handlers[event.key];
@@ -45,7 +47,7 @@ export const useAntitris = (seed: string) => {
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [move, rotate, hardDrop]);
+  }, [gravity, move, rotate, hardDrop]);
 
   return { state, level, flipping, move, rotate, hardDrop, restart };
 };

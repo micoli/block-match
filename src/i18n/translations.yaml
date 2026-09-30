@@ -1,0 +1,103 @@
+fr:
+  common:
+    level: "Niveau {level}"
+    seed: "seed : {seed}"
+    score: "Score"
+    points: "points"
+    backHome: "Retour à l'accueil"
+  home:
+    subtitle: "Même seed, mêmes niveaux, mêmes tirages."
+    seedLabel: "Seed"
+    randomSeed: "Seed aléatoire"
+    language: "Langue"
+  blockMatch:
+    hud:
+      backToMap: "Retour à la carte"
+      restart: "Recommencer le niveau"
+      total: "Total"
+      gravity: "Gravité"
+      flipIn: "inversion dans {moves}"
+      moves: "coups"
+    endModal:
+      won: "Niveau réussi !"
+      bonus: "dont {bonus} de bonus"
+      next: "Niveau suivant"
+      lost: "Plus de coups…"
+      goalsMissed: "Les objectifs ne sont pas atteints."
+      retry: "Réessayer"
+      map: "Carte"
+    map:
+      title: "Carte"
+      totalScore: "Score total"
+    loader:
+      preparing: "Le solveur prépare le niveau…"
+    stars:
+      label: "{count} étoiles sur {max}"
+  antitris:
+    help: "Tap : tourner · Glisser ← → : déplacer · Glisser vers la chute : poser"
+    restart: "Recommencer"
+    best: "Record"
+    lines: "Lignes"
+    next: "Suivante"
+    nextPiece: "Prochaine pièce : {kind}"
+    flipIn: "inversion dans {pieces}"
+    lineClear:
+      "1": "Simple"
+      "2": "Double"
+      "3": "Triple"
+      "4": "Tetris !"
+    gameOver: "Partie terminée"
+    newBest: "Nouveau record !"
+    replay: "Rejouer"
+
+en:
+  common:
+    level: "Level {level}"
+    seed: "seed: {seed}"
+    score: "Score"
+    points: "points"
+    backHome: "Back to home"
+  home:
+    subtitle: "Same seed, same levels, same draws."
+    seedLabel: "Seed"
+    randomSeed: "Random seed"
+    language: "Language"
+  blockMatch:
+    hud:
+      backToMap: "Back to the map"
+      restart: "Restart level"
+      total: "Total"
+      gravity: "Gravity"
+      flipIn: "flip in {moves}"
+      moves: "moves"
+    endModal:
+      won: "Level cleared!"
+      bonus: "including {bonus} bonus"
+      next: "Next level"
+      lost: "Out of moves…"
+      goalsMissed: "The goals were not reached."
+      retry: "Try again"
+      map: "Map"
+    map:
+      title: "Map"
+      totalScore: "Total score"
+    loader:
+      preparing: "The solver is preparing the level…"
+    stars:
+      label: "{count} of {max} stars"
+  antitris:
+    help: "Tap: rotate · Swipe ← →: move · Swipe toward the fall: drop"
+    restart: "Restart"
+    best: "Best"
+    lines: "Lines"
+    next: "Next"
+    nextPiece: "Next piece: {kind}"
+    flipIn: "flip in {pieces}"
+    lineClear:
+      "1": "Single"
+      "2": "Double"
+      "3": "Triple"
+      "4": "Tetris!"
+    gameOver: "Game over"
+    newBest: "New best!"
+    replay: "Play again"

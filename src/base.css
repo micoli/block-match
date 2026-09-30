@@ -147,3 +147,27 @@ small {
   color: var(--muted);
   font-size: 0.85rem;
 }
+
+.language-switcher {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--panel);
+}
+
+.language-switcher__button {
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 700;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.language-switcher__button--active {
+  color: #422006;
+  background: var(--gold);
+}

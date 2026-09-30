@@ -1,34 +1,35 @@
-import { LINE_CLEAR_LABELS } from '../game/scoring';
 import type { GameState } from '../game/types';
 import NextPiece from './NextPiece';
+import { useI18n } from '../../../i18n/useI18n';
 
 type Props = { state: GameState; level: number; best: number };
 
 const Hud = ({ state, level, best }: Props) => {
+  const { t, formatNumber } = useI18n();
   const { score, lines, next, gravity, flipAt, placed, lastClear } = state;
   return (
     <header className="ft-hud">
       <div className="ft-hud__stats">
         <span>
-          Score <strong>{score.toLocaleString('fr-FR')}</strong>
+          {t('common.score')} <strong>{formatNumber(score)}</strong>
         </span>
         <span>
-          Record <strong>{Math.max(best, score).toLocaleString('fr-FR')}</strong>
+          {t('antitris.best')} <strong>{formatNumber(Math.max(best, score))}</strong>
         </span>
         <span>
-          Niveau <strong>{level}</strong> · Lignes <strong>{lines}</strong>
+          {t('common.level', { level })} · {t('antitris.lines')} <strong>{lines}</strong>
         </span>
         <span className={`ft-hud__gravity ft-hud__gravity--${gravity}`}>
-          {gravity === 'down' ? '⬇' : '⬆'} <small>inversion dans {flipAt - placed}</small>
+          {gravity === 'down' ? '⬇' : '⬆'} <small>{t('antitris.flipIn', { pieces: flipAt - placed })}</small>
         </span>
       </div>
       <div className="ft-hud__next">
-        <small>Suivante</small>
+        <small>{t('antitris.next')}</small>
         <NextPiece kind={next} />
       </div>
       {lastClear && (
         <p key={lastClear.id} className="ft-hud__clear">
-          {LINE_CLEAR_LABELS[lastClear.lines]} +{lastClear.points}
+          {t(`antitris.lineClear.${lastClear.lines}`)} +{lastClear.points}
         </p>
       )}
     </header>

@@ -1,6 +1,7 @@
 import type { Progress } from '../game/types';
 import { totalStars } from '../game/progress';
 import Stars from './Stars';
+import { useI18n } from '../../../i18n/useI18n';
 
 const LEVELS_AHEAD = 11;
 
@@ -12,24 +13,25 @@ type Props = {
 };
 
 const LevelMap = ({ seed, progress, onPlay, onChangeSeed }: Props) => {
+  const { t, formatNumber } = useI18n();
   const count = progress.unlocked + LEVELS_AHEAD;
 
   return (
     <main className="screen">
       <header className="map__header">
-        <button className="icon-button" onClick={onChangeSeed} aria-label="Retour à l'accueil">
+        <button className="icon-button" onClick={onChangeSeed} aria-label={t('common.backHome')}>
           ←
         </button>
         <div>
-          <h1>Carte</h1>
-          <small>seed : {seed}</small>
+          <h1>{t('blockMatch.map.title')}</h1>
+          <small>{t('common.seed', { seed })}</small>
         </div>
       </header>
-      <section className="map__score" aria-label="Score total">
-        <small>Score total</small>
-        <strong>{progress.score.toLocaleString('fr-FR')}</strong>
+      <section className="map__score" aria-label={t('blockMatch.map.totalScore')}>
+        <small>{t('blockMatch.map.totalScore')}</small>
+        <strong>{formatNumber(progress.score)}</strong>
         <span>
-          Niveau {progress.unlocked} · ★ {totalStars(progress)}
+          {t('common.level', { level: progress.unlocked })} · ★ {totalStars(progress)}
         </span>
       </section>
       <ol className="map__grid">

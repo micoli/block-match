@@ -6,8 +6,6 @@ const SPEED_FACTOR = 0.85;
 
 export const HARD_DROP_POINTS_PER_ROW = 2;
 
-export const LINE_CLEAR_LABELS = ['', 'Simple', 'Double', 'Triple', 'Tetris !'];
-
 export const levelFor = (lines: number) => 1 + Math.floor(lines / LINES_PER_LEVEL);
 
 export const lineClearPoints = (lines: number, level: number) => LINE_POINTS[lines] * level;
