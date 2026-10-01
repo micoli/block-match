@@ -28,8 +28,10 @@ fr:
       goalsMissed: "Les objectifs ne sont pas atteints."
       retry: "Réessayer"
       map: "Carte"
+      tryHardLocked: "Mode try hard : il faut 3 étoiles pour passer au niveau suivant."
     map:
       title: "Carte"
+      tryHard: "Try hard"
       totalScore: "Score total"
     loader:
       preparing: "Le solveur prépare le niveau…"
@@ -99,8 +101,10 @@ en:
       goalsMissed: "The goals were not reached."
       retry: "Try again"
       map: "Map"
+      tryHardLocked: "Try hard mode: you need 3 stars to move on to the next level."
     map:
       title: "Map"
+      tryHard: "Try hard"
       totalScore: "Total score"
     loader:
       preparing: "The solver is preparing the level…"

@@ -1004,3 +1004,64 @@
     animation: none;
   }
 }
+
+/* ---------- try hard ---------- */
+
+.try-hard-toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  padding: 6px 10px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 200ms, background 200ms;
+}
+
+.try-hard-toggle--on {
+  border-color: #f97316;
+  background: rgba(249, 115, 22, 0.2);
+}
+
+.try-hard-toggle__input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.try-hard-toggle__switch {
+  position: relative;
+  width: 38px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  transition: background 200ms;
+}
+
+.try-hard-toggle__switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 200ms;
+}
+
+.try-hard-toggle--on .try-hard-toggle__switch {
+  background: #f97316;
+}
+
+.try-hard-toggle--on .try-hard-toggle__switch::after {
+  transform: translateX(16px);
+}
+
+.try-hard-toggle__input:focus-visible ~ .try-hard-toggle__switch {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}

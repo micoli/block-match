@@ -39,6 +39,14 @@ export const saveLevelResult = (seed: string, levelNumber: number, stars: number
   return next;
 };
 
+export const highestPlayableLevel = (progress: Progress, tryHard: boolean) => {
+  if (!tryHard) return progress.unlocked;
+  for (let level = 1; level < progress.unlocked; level++) {
+    if ((progress.stars[level] ?? 0) < 3) return level;
+  }
+  return progress.unlocked;
+};
+
 export const totalStars = (progress: Progress) => Object.values(progress.stars).reduce((sum, count) => sum + count, 0);
 
 export const encodeProgress = (progress: Progress) => {

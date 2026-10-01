@@ -7,12 +7,13 @@ type Props = {
   stars: number;
   score: number;
   bonus: number;
+  tryHard: boolean;
   onNext: () => void;
   onRetry: () => void;
   onExit: () => void;
 };
 
-const EndModal = ({ status, stars, score, bonus, onNext, onRetry, onExit }: Props) => {
+const EndModal = ({ status, stars, score, bonus, tryHard, onNext, onRetry, onExit }: Props) => {
   const { t, formatNumber } = useI18n();
   return (
     <div className="modal-backdrop">
@@ -25,9 +26,18 @@ const EndModal = ({ status, stars, score, bonus, onNext, onRetry, onExit }: Prop
               <strong>{formatNumber(score)}</strong> {t('common.points')}
               {bonus > 0 && <small> {t('blockMatch.endModal.bonus', { bonus: formatNumber(bonus) })}</small>}
             </p>
-            <button className="button" onClick={onNext}>
-              {t('blockMatch.endModal.next')}
-            </button>
+            {tryHard && stars < 3 ? (
+              <>
+                <p>{t('blockMatch.endModal.tryHardLocked')}</p>
+                <button className="button" onClick={onRetry}>
+                  {t('blockMatch.endModal.retry')}
+                </button>
+              </>
+            ) : (
+              <button className="button" onClick={onNext}>
+                {t('blockMatch.endModal.next')}
+              </button>
+            )}
           </>
         ) : (
           <>

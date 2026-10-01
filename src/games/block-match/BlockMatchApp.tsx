@@ -4,6 +4,7 @@ import { buildGameUrl } from '../../shared/url';
 import GameScreen from './components/GameScreen';
 import LevelMap from './components/LevelMap';
 import { decodeProgress, encodeProgress, importProgress, loadProgress, saveLevelResult } from './game/progress';
+import { useStoredFlag } from '../../shared/useStoredFlag';
 import './styles.css';
 
 const GAME_ID = 'block-match';
@@ -23,6 +24,7 @@ const BlockMatchApp = ({ seed, gravityEnabled, onHome }: GameProps) => {
   const [initial] = useState(readUrlParams);
   const [screen, setScreen] = useState<Screen>(initial.level ? 'game' : 'map');
   const [levelNumber, setLevelNumber] = useState(initial.level ?? 1);
+  const [tryHard, setTryHard] = useStoredFlag('block-match:try-hard', false);
   const [attempt, setAttempt] = useState(0);
   const [progress, setProgress] = useState(() => (initial.shared ? importProgress(seed, initial.shared) : loadProgress(seed)));
 
@@ -39,7 +41,7 @@ const BlockMatchApp = ({ seed, gravityEnabled, onHome }: GameProps) => {
   };
 
   if (screen === 'map') {
-    return <LevelMap seed={seed} progress={progress} onPlay={play} onChangeSeed={onHome} />;
+    return <LevelMap seed={seed} progress={progress} tryHard={tryHard} onTryHardChange={setTryHard} onPlay={play} onChangeSeed={onHome} />;
   }
 
   return (
@@ -47,6 +49,7 @@ const BlockMatchApp = ({ seed, gravityEnabled, onHome }: GameProps) => {
       key={`${seed}-${levelNumber}-${attempt}`}
       seed={seed}
       gravityEnabled={gravityEnabled}
+      tryHard={tryHard}
       levelNumber={levelNumber}
       baseScore={progress.score}
       onWin={(number, stars, points) => setProgress(saveLevelResult(seed, number, stars, points))}

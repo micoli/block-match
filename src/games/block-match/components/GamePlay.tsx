@@ -11,6 +11,7 @@ type Props = {
   level: Level;
   seed: string;
   gravityEnabled: boolean;
+  tryHard: boolean;
   levelNumber: number;
   baseScore: number;
   onWin: (levelNumber: number, stars: number, points: number) => void;
@@ -19,7 +20,7 @@ type Props = {
   onExit: () => void;
 };
 
-const GamePlay = ({ level, seed, gravityEnabled, levelNumber, baseScore, onWin, onNext, onRetry, onExit }: Props) => {
+const GamePlay = ({ level, seed, gravityEnabled, tryHard, levelNumber, baseScore, onWin, onNext, onRetry, onExit }: Props) => {
   const game = useGame(level, gravityEnabled);
   const [hint, setHint] = useState<Move | null>(null);
   const [startScore] = useState(baseScore);
@@ -54,6 +55,7 @@ const GamePlay = ({ level, seed, gravityEnabled, levelNumber, baseScore, onWin, 
           stars={game.stars}
           score={game.score}
           bonus={game.bonus}
+          tryHard={tryHard}
           onNext={onNext}
           onRetry={onRetry}
           onExit={onExit}
