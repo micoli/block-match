@@ -12,6 +12,8 @@ fr:
     language: "Langue"
     gravity: "Gravité active"
     gravityHint: "Inversions de gravité, avec +25 % de score en anti-gravité."
+    install: "Installer l'application"
+    installIos: "Pour installer : bouton Partager de Safari, puis « Sur l'écran d'accueil »."
   blockMatch:
     hud:
       backToMap: "Retour à la carte"
@@ -85,6 +87,8 @@ en:
     language: "Language"
     gravity: "Gravity enabled"
     gravityHint: "Gravity flips, with +25% score while in anti-gravity."
+    install: "Install the app"
+    installIos: "To install: tap Safari's Share button, then “Add to Home Screen”."
   blockMatch:
     hud:
       backToMap: "Back to the map"

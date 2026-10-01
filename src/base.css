@@ -276,3 +276,10 @@ small {
     animation: none;
   }
 }
+
+.menu__install-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  text-align: center;
+  color: var(--muted);
+}

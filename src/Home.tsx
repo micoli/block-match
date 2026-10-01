@@ -4,6 +4,7 @@ import { randomSeed } from './shared/seed';
 import GravityToggle from './GravityToggle';
 import LanguageSwitcher from './i18n/LanguageSwitcher';
 import { useI18n } from './i18n/useI18n';
+import { useInstallPrompt } from './shared/useInstallPrompt';
 
 type Props = {
   seed: string;
@@ -14,6 +15,7 @@ type Props = {
 
 const Home = ({ seed, gravityEnabled, onGravityChange, onStart }: Props) => {
   const { t } = useI18n();
+  const { canInstall, needsManualInstall, install } = useInstallPrompt();
   const [value, setValue] = useState(seed);
 
   const start = (gameId: string) => onStart(gameId, value.trim() || randomSeed());
@@ -47,6 +49,12 @@ const Home = ({ seed, gravityEnabled, onGravityChange, onStart }: Props) => {
         </div>
         <GravityToggle enabled={gravityEnabled} onChange={onGravityChange} />
       </form>
+      {canInstall && (
+        <button type="button" className="button button--secondary" onClick={install}>
+          {t('home.install')}
+        </button>
+      )}
+      {needsManualInstall && <p className="menu__install-hint">{t('home.installIos')}</p>}
     </main>
   );
 };
