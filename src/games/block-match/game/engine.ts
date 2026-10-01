@@ -183,6 +183,8 @@ const blastCells = (board: Board, { r, c, type, color }: Activation): Pos[] => {
   }
 };
 
+const LIGHTNING_TYPES: ActivationType[] = ['color', 'lightball'];
+
 type ClearInput = {
   groups?: MatchGroup[];
   activations?: Activation[];
@@ -202,6 +204,10 @@ export const planClear = (
 
   const clearCell = (r: number, c: number) => cleared.set(cellKey(r, c), { r, c });
   const hitBox = (r: number, c: number) => boxHits.set(cellKey(r, c), { r, c });
+  const hitAdjacentBoxes = (r: number, c: number) =>
+    NEIGHBORS.forEach(([dr, dc]) => {
+      if (inBounds(board, r + dr, c + dc) && board.boxes[r + dr][c + dc] > 0) hitBox(r + dr, c + dc);
+    });
   const hit = (r: number, c: number) => {
     if (!inBounds(board, r, c) || board.holes[r][c]) return;
     if (board.boxes[r][c] > 0) {
@@ -225,9 +231,7 @@ export const planClear = (
   groups.forEach((group) => {
     group.cells.forEach(({ r, c }) => {
       clearCell(r, c);
-      NEIGHBORS.forEach(([dr, dc]) => {
-        if (inBounds(board, r + dr, c + dc) && board.boxes[r + dr][c + dc] > 0) hitBox(r + dr, c + dc);
-      });
+      hitAdjacentBoxes(r, c);
     });
     if (!group.special) return;
     const origin =
@@ -241,6 +245,10 @@ export const planClear = (
     const cells = blastCells(board, activation);
     blasts.push({ ...activation, cells });
     cells.forEach(({ r, c }) => hit(r, c));
+    if (!LIGHTNING_TYPES.includes(activation.type)) continue;
+    cells.forEach(({ r, c }) => {
+      if (inBounds(board, r, c) && board.boxes[r][c] === 0) hitAdjacentBoxes(r, c);
+    });
   }
 
   return { cleared: [...cleared.values()], boxHits: [...boxHits.values()], created, blasts };

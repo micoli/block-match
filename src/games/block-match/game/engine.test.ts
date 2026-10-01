@@ -65,3 +65,27 @@ describe('finale explosion', () => {
     expect(board.tiles.flat().every((tile) => tile === null)).toBe(true);
   });
 });
+
+describe('lightning', () => {
+  const boardWithBoxNextToColor = () => {
+    const { board } = createBoard(generateLevel('royal', 9));
+    board.boxes.forEach((row) => row.fill(0));
+    const target = { r: 4, c: 3 };
+    const color = board.tiles[target.r][target.c]!.color!;
+    board.boxes[target.r][target.c + 1] = 1;
+    board.tiles[target.r][target.c + 1] = null;
+    return { board, color };
+  };
+
+  it('hits boxes adjacent to the tiles it clears', () => {
+    const { board, color } = boardWithBoxNextToColor();
+    const plan = planClear(board, { activations: [{ r: 0, c: 0, type: 'color', color }] });
+    expect(plan.boxHits).toContainEqual({ r: 4, c: 4 });
+  });
+
+  it('does not extend to boxes next to other bonus blasts', () => {
+    const { board } = boardWithBoxNextToColor();
+    const plan = planClear(board, { activations: [{ r: 4, c: 3, type: 'rocketV' }] });
+    expect(plan.boxHits).toEqual([]);
+  });
+});
