@@ -6,7 +6,7 @@ import LevelLoader from './LevelLoader';
 type Props = Omit<ComponentProps<typeof GamePlay>, 'level'>;
 
 const GameScreen = ({ seed, gravityEnabled, tryHard, levelNumber, ...handlers }: Props) => {
-  const level = useLevel(seed, levelNumber);
+  const level = useLevel(seed, levelNumber, tryHard);
 
   if (!level) return <LevelLoader levelNumber={levelNumber} onExit={handlers.onExit} />;
 

@@ -3,6 +3,7 @@ import { createGravityFlips } from './gravity';
 import { createGrid, setMirrored } from './grid';
 import { hashSeed } from '../../../shared/seed';
 import { createRng } from './rng';
+import { minMovesForThreeStars } from './scoring';
 import { solve } from './solver';
 
 const DIFFICULTY_RAMP = 60;
@@ -175,19 +176,21 @@ const humanBudget = (solverMoves: number) => Math.ceil(solverMoves * HUMAN_MARGI
 
 // Guarantees winnability: a bot plays the real engine with the level's seeded rng, so a
 // winning sequence within the returned budget is known to exist.
-const withWinnableBudget = (level: Level): Level => {
+// In try hard mode the budget also leaves enough spare moves after the bot's win for three stars.
+const withWinnableBudget = (level: Level, tryHard: boolean): Level => {
   let current = level;
   for (;;) {
     const solverMoves = solve(current, MAX_SOLVER_MOVES);
     if (solverMoves !== null) {
-      const moves = Math.min(MAX_MOVES, Math.max(current.moves, humanBudget(solverMoves)));
-      return { ...current, moves };
+      const budget = Math.max(current.moves, humanBudget(solverMoves));
+      const moves = tryHard ? Math.max(budget, minMovesForThreeStars(solverMoves)) : Math.min(MAX_MOVES, budget);
+      if (moves <= MAX_MOVES) return { ...current, moves };
     }
     current = easeLevel(current);
   }
 };
 
-export const generateLevel = (seed: string, number: number): Level => {
+export const generateLevel = (seed: string, number: number, tryHard = false): Level => {
   const rng = createRng(hashSeed(`${seed}:level:${number}`));
   const difficulty = Math.min(1, (number - 1) / DIFFICULTY_RAMP);
   const cols = number <= 3 ? 7 : rng.int(7, 9);
@@ -214,5 +217,5 @@ export const generateLevel = (seed: string, number: number): Level => {
     tileSeed: hashSeed(`${seed}:tiles:${number}`),
     gravityFlips: createGravityFlips(seed, number),
   };
-  return withWinnableBudget(level);
+  return withWinnableBudget(level, tryHard);
 };

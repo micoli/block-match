@@ -19,7 +19,7 @@ import {
 import { buildEffects, createVortexEffect } from '../game/effects';
 import { gravityAfter, movesUntilFlip } from '../game/gravity';
 import { withAntigravBonus } from '../../../shared/gravity';
-import { clearPoints, remainingMovePoints } from '../game/scoring';
+import { clearPoints, remainingMovePoints, THREE_STARS_MIN_MOVES_LEFT_RATIO } from '../game/scoring';
 import type { ClearStats, Effect, Goal, GoalProgress, GameStatus, Gravity, Level, Plan, Pos, Special } from '../game/types';
 
 type Live = {
@@ -59,7 +59,7 @@ const applyStatsToGoals = (goals: GoalProgress[], stats: ClearStats) =>
 
 const computeStars = (movesLeft: number, totalMoves: number) => {
   const ratio = movesLeft / totalMoves;
-  if (ratio >= 0.3) return 3;
+  if (ratio >= THREE_STARS_MIN_MOVES_LEFT_RATIO) return 3;
   if (ratio >= 0.12) return 2;
   return 1;
 };
