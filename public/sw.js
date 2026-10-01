@@ -1,4 +1,4 @@
-const CACHE = 'block-match-v1';
+const CACHE = 'block-match-__BUILD_ID__';
 const ASSET_PATTERN = /(?:src|href)="([^"]+\/assets\/[^"]+)"/g;
 
 const precache = async () => {
@@ -16,7 +16,12 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key))))
+      .then(() => self.clients.claim()),
+  );
 });
 
 const networkFirst = async (request) => {
