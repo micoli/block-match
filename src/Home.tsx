@@ -55,6 +55,7 @@ const Home = ({ seed, gravityEnabled, onGravityChange, onStart }: Props) => {
         </button>
       )}
       {needsManualInstall && <p className="menu__install-hint">{t('home.installIos')}</p>}
+      <small className="menu__build">{t('home.build', { build: __BUILD_ID__ })}</small>
     </main>
   );
 };

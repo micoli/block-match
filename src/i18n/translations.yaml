@@ -13,6 +13,7 @@ fr:
     gravity: "Gravité active"
     gravityHint: "Inversions de gravité, avec +25 % de score en anti-gravité."
     install: "Installer l'application"
+    build: "Build {build}"
     installIos: "Pour installer : bouton Partager de Safari, puis « Sur l'écran d'accueil »."
   blockMatch:
     hud:
@@ -93,6 +94,7 @@ en:
     gravity: "Gravity enabled"
     gravityHint: "Gravity flips, with +25% score while in anti-gravity."
     install: "Install the app"
+    build: "Build {build}"
     installIos: "To install: tap Safari's Share button, then “Add to Home Screen”."
   blockMatch:
     hud:
