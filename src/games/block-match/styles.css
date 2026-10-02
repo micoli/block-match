@@ -439,6 +439,8 @@
   gap: 12px;
   min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   margin: 0;
   padding: 0 0 0 28px;
 }
@@ -451,6 +453,7 @@
   --cell: min(34px, calc((100vw - 120px) / var(--cols)));
   border-radius: 8px;
   cursor: default;
+  touch-action: pan-y;
 }
 
 .solution__arrow {
