@@ -17,10 +17,11 @@ import {
   swapTiles,
 } from '../game/engine';
 import { buildEffects, createVortexEffect } from '../game/effects';
+import { solveFrom } from '../game/solver';
 import { gravityAfter, movesUntilFlip } from '../game/gravity';
 import { withAntigravBonus } from '../../../shared/gravity';
 import { clearPoints, remainingMovePoints, THREE_STARS_MIN_MOVES_LEFT_RATIO } from '../game/scoring';
-import type { ClearStats, Effect, Goal, GoalProgress, GameStatus, Gravity, Level, Plan, Pos, Special } from '../game/types';
+import type { ClearStats, Effect, Goal, GoalProgress, GameStatus, Gravity, Level, Plan, Pos, SolutionStep, Special } from '../game/types';
 
 type Live = {
   goals: GoalProgress[];
@@ -253,6 +254,15 @@ export const useGame = (level: Level, gravityEnabled: boolean) => {
 
   const hint = () => (canAct() ? findPossibleMove(session.board) : null);
 
+  const threeStarSolution = (): SolutionStep[] | null => {
+    if (!canAct()) return null;
+    const spareMoves = Math.ceil(level.moves * THREE_STARS_MIN_MOVES_LEFT_RATIO - 1e-9);
+    const maxMoves = live.current.movesLeft - spareMoves;
+    if (maxMoves < 1) return null;
+    const remaining = live.current.goals.map((goal) => goal.remaining);
+    return solveFrom(level, session.board, session.rng, remaining, maxMoves);
+  };
+
   return {
     board,
     goals,
@@ -269,5 +279,6 @@ export const useGame = (level: Level, gravityEnabled: boolean) => {
     swap,
     activate,
     hint,
+    threeStarSolution,
   };
 };

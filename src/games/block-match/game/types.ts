@@ -4,6 +4,8 @@ export type Pos = { r: number; c: number };
 
 export type Special = 'rocketH' | 'rocketV' | 'bomb' | 'lightball';
 
+export type SolutionStep = { move: Move; board: Board };
+
 export type ActivationType = Special | 'bigBomb' | 'cross' | 'bigCross' | 'color' | 'all';
 
 export type Tile = {

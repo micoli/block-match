@@ -427,6 +427,40 @@
   color: var(--muted);
 }
 
+.modal--wide {
+  max-width: 420px;
+  max-height: 90dvh;
+}
+
+.solution {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0 0 0 28px;
+}
+
+.solution li::marker {
+  font-weight: 800;
+}
+
+.board--mini {
+  --cell: min(34px, calc((100vw - 120px) / var(--cols)));
+  border-radius: 8px;
+  cursor: default;
+}
+
+.solution__arrow {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
 /* ---------- animations ---------- */
 
 @keyframes tile-drop {

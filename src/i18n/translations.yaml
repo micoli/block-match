@@ -22,6 +22,11 @@ fr:
       gravity: "Gravité"
       flipIn: "inversion dans {moves}"
       moves: "coups"
+    solution:
+      title: "Solution 3 étoiles"
+      legend: "Glisse la gemme vers l'autre en suivant la flèche. Sans flèche, touche la gemme spéciale."
+      none: "Aucune solution 3 étoiles trouvée depuis cette position."
+      close: "Fermer"
     endModal:
       won: "Niveau réussi !"
       bonus: "dont {bonus} de bonus"
@@ -97,6 +102,11 @@ en:
       gravity: "Gravity"
       flipIn: "flip in {moves}"
       moves: "moves"
+    solution:
+      title: "Three-star solution"
+      legend: "Swap the highlighted gems following the arrow. With no arrow, tap the special gem."
+      none: "No three-star solution found from this position."
+      close: "Close"
     endModal:
       won: "Level cleared!"
       bonus: "including {bonus} bonus"

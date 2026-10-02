@@ -13,11 +13,9 @@ import {
   swapTiles,
 } from './engine';
 import { createRng } from './rng';
-import type { Board, ClearStats, Goal, Level, Plan, Pos, Rng } from './types';
+import type { Board, ClearStats, Goal, Level, Move, Plan, Rng, SolutionStep } from './types';
 
 type State = { board: Board; rng: Rng; remaining: number[] };
-
-type SolverMove = { type: 'tap'; from: Pos } | { type: 'swap'; from: Pos; to: Pos };
 
 const cloneRng = (rng: Rng) => {
   const copy = createRng(0);
@@ -48,27 +46,27 @@ const runCascade = (board: Board, rng: Rng, firstPlan: Plan, goals: Goal[], rema
 };
 
 const listMoves = (board: Board) => {
-  const moves: SolverMove[] = [];
+  const moves: Move[] = [];
   for (let r = 0; r < board.rows; r++) {
     for (let c = 0; c < board.cols; c++) {
       const tile = board.tiles[r][c];
       if (!tile) continue;
-      if (tile.special) moves.push({ type: 'tap', from: { r, c } });
+      if (tile.special) moves.push({ from: { r, c }, to: null });
       for (const to of [{ r, c: c + 1 }, { r: r + 1, c }]) {
         if (!board.tiles[to.r]?.[to.c] || !areAdjacent({ r, c }, to)) continue;
-        moves.push({ type: 'swap', from: { r, c }, to });
+        moves.push({ from: { r, c }, to });
       }
     }
   }
   return moves;
 };
 
-const tryMove = (state: State, move: SolverMove, level: Level): State | null => {
+const tryMove = (state: State, move: Move, level: Level): State | null => {
   const { goals } = level;
   const board = cloneBoard(state.board);
   const rng = cloneRng(state.rng);
   let plan: Plan | null;
-  if (move.type === 'tap') {
+  if (!move.to) {
     plan = planTap(board, move.from);
   } else {
     swapTiles(board, move.from, move.to);
@@ -88,27 +86,33 @@ const score = (state: State, goals: Goal[]) => -progressOf(state.remaining, goal
 
 const bestMove = (state: State, level: Level) => {
   const { goals } = level;
-  let best: { value: number; next: State } | null = null;
+  let best: { value: number; next: State; move: Move } | null = null;
   for (const move of listMoves(state.board)) {
     const next = tryMove(state, move, level);
     if (!next) continue;
     const value = score(next, goals);
-    if (!best || value > best.value) best = { value, next };
+    if (!best || value > best.value) best = { value, next, move };
   }
-  return best?.next ?? null;
+  return best;
 };
 
-// Plays a greedy bot with the exact engine and seeded rng: the returned count is a move
-// budget for which a winning sequence is known to exist.
-export const solve = (level: Level, maxMoves: number): number | null => {
-  const { board, rng } = createBoard(level);
-  const goals = level.goals;
-  let state: State = { board, rng, remaining: goals.map((goal) => goal.target) };
-  for (let moves = 1; moves <= maxMoves; moves++) {
-    const next = bestMove(state, level);
-    if (!next) return null;
-    state = next;
-    if (state.remaining.every((left) => left === 0)) return moves;
+// Plays a greedy bot with the exact engine and seeded rng: the returned steps are a sequence
+// for which a win is known to exist.
+export const solveFrom = (level: Level, board: Board, rng: Rng, remaining: number[], maxMoves: number): SolutionStep[] | null => {
+  let state: State = { board: cloneBoard(board), rng: cloneRng(rng), remaining };
+  const steps: SolutionStep[] = [];
+  while (steps.length < maxMoves) {
+    const best = bestMove(state, level);
+    if (!best) return null;
+    steps.push({ move: best.move, board: state.board });
+    state = best.next;
+    if (state.remaining.every((left) => left === 0)) return steps;
   }
   return null;
+};
+
+export const solve = (level: Level, maxMoves: number): number | null => {
+  const { board, rng } = createBoard(level);
+  const steps = solveFrom(level, board, rng, level.goals.map((goal) => goal.target), maxMoves);
+  return steps?.length ?? null;
 };

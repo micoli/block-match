@@ -14,6 +14,7 @@ type Props = {
   totalScore: number;
   onExit: () => void;
   onRestart: () => void;
+  onMovesTap: () => void;
 };
 
 const Hud = ({
@@ -28,6 +29,7 @@ const Hud = ({
   totalScore,
   onExit,
   onRestart,
+  onMovesTap,
 }: Props) => {
   const { t } = useI18n();
   return (
@@ -64,7 +66,7 @@ const Hud = ({
         )}
       </div>
       <div className="hud__panel">
-        <div className="hud__moves">
+        <div className="hud__moves" onClick={onMovesTap}>
           <span>{movesLeft}</span>
           <small>{t('blockMatch.hud.moves')}</small>
         </div>

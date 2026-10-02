@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
-import type { Level, Move } from '../game/types';
+import type { Level, Move, SolutionStep } from '../game/types';
 import { useGame } from '../hooks/useGame';
+import { useTapCounter } from '../hooks/useTapCounter';
 import Board from './Board';
 import EndModal from './EndModal';
 import Hud from './Hud';
+import SolutionModal from './SolutionModal';
 
 const HINT_DELAY_MS = 5000;
+const SOLUTION_TAPS = 6;
 
 type Props = {
   level: Level;
@@ -24,6 +27,8 @@ const GamePlay = ({ level, seed, gravityEnabled, tryHard, levelNumber, baseScore
   const game = useGame(level, gravityEnabled);
   const [hint, setHint] = useState<Move | null>(null);
   const [startScore] = useState(baseScore);
+  const [solution, setSolution] = useState<{ steps: SolutionStep[] | null } | null>(null);
+  const onMovesTap = useTapCounter(SOLUTION_TAPS, () => setSolution({ steps: game.threeStarSolution() }));
 
   useEffect(() => {
     setHint(null);
@@ -38,7 +43,7 @@ const GamePlay = ({ level, seed, gravityEnabled, tryHard, levelNumber, baseScore
 
   return (
     <main className="game">
-      <Hud seed={seed} levelNumber={levelNumber} movesLeft={game.movesLeft} goals={game.goals} gravityEnabled={gravityEnabled} gravity={game.gravity} movesToFlip={game.movesToFlip} score={game.score} totalScore={startScore + game.score} onExit={onExit} onRestart={onRetry} />
+      <Hud seed={seed} levelNumber={levelNumber} movesLeft={game.movesLeft} goals={game.goals} gravityEnabled={gravityEnabled} gravity={game.gravity} movesToFlip={game.movesToFlip} score={game.score} totalScore={startScore + game.score} onExit={onExit} onRestart={onRetry} onMovesTap={onMovesTap} />
       <Board
         board={game.board}
         hint={hint}
@@ -49,6 +54,7 @@ const GamePlay = ({ level, seed, gravityEnabled, tryHard, levelNumber, baseScore
         onSwap={game.swap}
         onActivate={game.activate}
       />
+      {solution && <SolutionModal steps={solution.steps} onClose={() => setSolution(null)} />}
       {game.status !== 'playing' && (
         <EndModal
           status={game.status}
